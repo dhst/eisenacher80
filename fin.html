@@ -13,9 +13,6 @@
             --text-main: #1e293b;
             --text-muted: #64748b;
             --primary: #2563eb;
-            --buy-color: #10b981;
-            --rent-color: #ef4444;
-            --debt-color: #94a3b8;
             --border: #e2e8f0;
         }
 
@@ -32,25 +29,26 @@
             flex-direction: column;
         }
 
-        header {
-            margin-bottom: 20px;
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 1.5rem;
-            color: var(--text-main);
+        header { margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end;}
+        header h1 { margin: 0; font-size: 1.5rem; }
+        
+        .result-badge {
+            background: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
         }
 
         .dashboard {
             display: grid;
-            grid-template-columns: 350px 1fr;
+            grid-template-columns: 400px 1fr;
             gap: 20px;
             flex: 1;
             min-height: 0;
         }
 
-        /* Sidebar Controls */
         .controls-panel {
             background: var(--panel-bg);
             border-radius: 12px;
@@ -72,21 +70,10 @@
         }
 
         .control-group { margin-bottom: 15px; }
-        
-        .control-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .control-header label {
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .control-header input[type="number"] {
-            width: 85px;
+        .control-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .control-header label { font-size: 0.9rem; font-weight: 500; }
+        .control-header input[type="number"], select {
+            width: 100px;
             padding: 4px 8px;
             border: 1px solid var(--border);
             border-radius: 6px;
@@ -95,21 +82,11 @@
             font-weight: 600;
             color: var(--primary);
         }
+        select { width: 100%; text-align: left; margin-bottom: 10px; padding: 8px; }
 
-        input[type="range"] {
-            width: 100%;
-            accent-color: var(--primary);
-            cursor: pointer;
-        }
+        input[type="range"] { width: 100%; accent-color: var(--primary); cursor: pointer; }
 
-        /* Charts Area */
-        .charts-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            overflow-y: auto;
-        }
-
+        .charts-panel { display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
         .chart-card {
             background: var(--panel-bg);
             border-radius: 12px;
@@ -121,18 +98,8 @@
             display: flex;
             flex-direction: column;
         }
-
-        .chart-card h2 {
-            font-size: 1.1rem;
-            margin: 0 0 15px 0;
-            color: var(--text-main);
-        }
-
-        .canvas-wrapper {
-            position: relative;
-            flex: 1;
-            width: 100%;
-        }
+        .chart-card h2 { font-size: 1.1rem; margin: 0 0 15px 0; }
+        .canvas-wrapper { position: relative; flex: 1; width: 100%; }
 
         @media (max-width: 1024px) {
             .dashboard { grid-template-columns: 1fr; }
@@ -144,81 +111,86 @@
 <body>
 
     <header>
-        <h1>Projekt Leipzig: Finanzierungs- & Lebenssimulator</h1>
+        <div>
+            <h1>Projekt Leipzig: Finanzierungs- & Lebenssimulator</h1>
+        </div>
+        <div class="result-badge" id="darlehenDisplay">Darlehen: 0 €</div>
     </header>
 
     <div class="dashboard">
         <!-- Controls Sidebar -->
         <div class="controls-panel">
+            
             <div class="control-section">
-                <h3>Immobilie & Kredit</h3>
-                
-                <div class="control-group">
-                    <div class="control-header"><label>Darlehenssumme (€)</label><input type="number" id="kreditNum" value="252250" step="1000" oninput="sync('kredit', this.value)"></div>
-                    <input type="range" id="kreditSlide" min="0" max="600000" step="1000" value="252250" oninput="sync('kredit', this.value)">
-                </div>
+                <h3>Projekt & Strategie</h3>
+                <select id="szenario" onchange="calculateAndDraw()">
+                    <option value="2">Szenario B: Sanierung Wohnung aus EK (Empfohlen)</option>
+                    <option value="1">Szenario A: Vollfinanzierung über Bank</option>
+                </select>
 
                 <div class="control-group">
-                    <div class="control-header"><label>Zinssatz p.a. (%)</label><input type="number" id="zinsNum" value="3.5" step="0.1" oninput="sync('zins', this.value)"></div>
-                    <input type="range" id="zinsSlide" min="0.5" max="8" step="0.1" value="3.5" oninput="sync('zins', this.value)">
+                    <div class="control-header"><label>Kaufpreis (€)</label><input type="number" id="kaufpreis" value="430000" step="5000"></div>
                 </div>
-
                 <div class="control-group">
-                    <div class="control-header"><label>Tilgung p.a. (%)</label><input type="number" id="tilgungNum" value="4.0" step="0.1" oninput="sync('tilgung', this.value)"></div>
-                    <input type="range" id="tilgungSlide" min="1" max="10" step="0.1" value="4.0" oninput="sync('tilgung', this.value)">
+                    <div class="control-header"><label>Sanierung Haus (€)</label><input type="number" id="sanHaus" value="70000" step="5000"></div>
                 </div>
-
                 <div class="control-group">
-                    <div class="control-header"><label>Sondertilgung p.a. (€)</label><input type="number" id="sondertilgungNum" value="2500" step="500" oninput="sync('sondertilgung', this.value)"></div>
-                    <input type="range" id="sondertilgungSlide" min="0" max="15000" step="500" value="2500" oninput="sync('sondertilgung', this.value)">
+                    <div class="control-header"><label>Sanierung Wohnung (€)</label><input type="number" id="sanWohnung" value="120000" step="5000"></div>
                 </div>
-                
                 <div class="control-group">
-                    <div class="control-header"><label>Wertsteigerung p.a. (%)</label><input type="number" id="immoZuwachsNum" value="1.5" step="0.1" oninput="sync('immoZuwachs', this.value)"></div>
-                    <input type="range" id="immoZuwachsSlide" min="-2" max="5" step="0.1" value="1.5" oninput="sync('immoZuwachs', this.value)">
+                    <div class="control-header"><label>Verfügbares Eigenkapital (€)</label><input type="number" id="ek" value="400000" step="10000"></div>
                 </div>
             </div>
 
             <div class="control-section">
-                <h3>Lebensplanung & Markt</h3>
-                
+                <h3>Darlehen & Markt</h3>
                 <div class="control-group">
-                    <div class="control-header"><label>Sparplan mtl. (€)</label><input type="number" id="sparplanNum" value="2000" step="100" oninput="sync('sparplan', this.value)"></div>
-                    <input type="range" id="sparplanSlide" min="0" max="5000" step="100" value="2000" oninput="sync('sparplan', this.value)">
+                    <div class="control-header"><label>Zinssatz p.a. (%)</label><input type="number" id="zinsNum" value="3.5" step="0.1"></div>
+                    <input type="range" id="zinsSlide" min="0.5" max="8" step="0.1" value="3.5">
                 </div>
-
                 <div class="control-group">
-                    <div class="control-header"><label>ETF Rendite p.a. (%)</label><input type="number" id="etfRenditeNum" value="5.0" step="0.1" oninput="sync('etfRendite', this.value)"></div>
-                    <input type="range" id="etfRenditeSlide" min="0" max="10" step="0.1" value="5.0" oninput="sync('etfRendite', this.value)">
+                    <div class="control-header"><label>Tilgung p.a. (%)</label><input type="number" id="tilgungNum" value="4.0" step="0.1"></div>
+                    <input type="range" id="tilgungSlide" min="1" max="10" step="0.1" value="4.0">
                 </div>
-
                 <div class="control-group">
-                    <div class="control-header"><label>Inflation p.a. (%)</label><input type="number" id="inflationNum" value="2.0" step="0.1" oninput="sync('inflation', this.value)"></div>
-                    <input type="range" id="inflationSlide" min="0" max="6" step="0.1" value="2.0" oninput="sync('inflation', this.value)">
+                    <div class="control-header"><label>Sondertilgung p.a. (€)</label><input type="number" id="sondertilgungNum" value="2500" step="500"></div>
+                    <input type="range" id="sondertilgungSlide" min="0" max="15000" step="500" value="2500">
                 </div>
-                
                 <div class="control-group">
-                    <div class="control-header"><label>Kaltmiete aktuell (€)</label><input type="number" id="mieteNum" value="1200" step="50" oninput="sync('miete', this.value)"></div>
-                    <input type="range" id="mieteSlide" min="500" max="3000" step="50" value="1200" oninput="sync('miete', this.value)">
+                    <div class="control-header"><label>ETF Rendite p.a. (%)</label><input type="number" id="etfRenditeNum" value="5.0" step="0.1"></div>
+                    <input type="range" id="etfRenditeSlide" min="0" max="10" step="0.1" value="5.0">
                 </div>
             </div>
 
             <div class="control-section">
-                <h3>Rente & Entnahmen</h3>
-                
+                <h3>Lebensplanung & Wohnkosten</h3>
                 <div class="control-group">
-                    <div class="control-header"><label>BAföG-Ersatz mtl. (€)</label><input type="number" id="bafoegNum" value="800" step="50" oninput="sync('bafoeg', this.value)"></div>
-                    <input type="range" id="bafoegSlide" min="0" max="2000" step="50" value="800" oninput="sync('bafoeg', this.value)">
+                    <div class="control-header"><label>Sparplan (mtl. bis Rente)</label><input type="number" id="sparplanNum" value="2000" step="100"></div>
+                    <input type="range" id="sparplanSlide" min="0" max="5000" step="100" value="2000">
                 </div>
-
                 <div class="control-group">
-                    <div class="control-header"><label>Rentenlücke mtl. (€)</label><input type="number" id="rentenLueckeNum" value="1000" step="100" oninput="sync('rentenLuecke', this.value)"></div>
-                    <input type="range" id="rentenLueckeSlide" min="0" max="4000" step="100" value="1000" oninput="sync('rentenLuecke', this.value)">
+                    <div class="control-header"><label>Kaltmiete (Vergleich, €)</label><input type="number" id="mieteNum" value="1200" step="50"></div>
+                    <input type="range" id="mieteSlide" min="500" max="3000" step="50" value="1200">
                 </div>
-
                 <div class="control-group">
-                    <div class="control-header"><label>Zusatz Pflege/Luxus (€)</label><input type="number" id="zusatzNum" value="0" step="100" oninput="sync('zusatz', this.value)"></div>
-                    <input type="range" id="zusatzSlide" min="0" max="5000" step="100" value="0" oninput="sync('zusatz', this.value)">
+                    <div class="control-header"><label>Hausgeld (Eigentum, €)</label><input type="number" id="hausgeldNum" value="350" step="10"></div>
+                    <input type="range" id="hausgeldSlide" min="100" max="1000" step="10" value="350">
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>Rente & Einkommen (Heutige Kaufkraft)</h3>
+                <div class="control-group">
+                    <div class="control-header"><label>Wunsch-Haushaltsnetto (€)</label><input type="number" id="wunschNettoNum" value="4500" step="100"></div>
+                    <input type="range" id="wunschNettoSlide" min="2000" max="10000" step="100" value="4500">
+                </div>
+                <div class="control-group">
+                    <div class="control-header"><label>Gesetzl. Rente Partner 1 (€)</label><input type="number" id="rente1Num" value="2000" step="100"></div>
+                    <input type="range" id="rente1Slide" min="0" max="4000" step="100" value="2000">
+                </div>
+                <div class="control-group">
+                    <div class="control-header"><label>Gesetzl. Rente Partner 2 (€)</label><input type="number" id="rente2Num" value="1500" step="100"></div>
+                    <input type="range" id="rente2Slide" min="0" max="4000" step="100" value="1500">
                 </div>
             </div>
         </div>
@@ -240,71 +212,104 @@
         let wealthChartInstance = null;
         let cashflowChartInstance = null;
 
-        // Feste Konstanten aus Szenario 2
-        const IMMO_STARTWERT = 620000; 
-        const HAUSGELD_START = 350;
-        const ETF_START_KAUFEN = 247750;
-        const ETF_START_MIETEN = 400000;
+        // Feste Projekt-Parameter
+        const INFLATION = 0.02;
+        const IMMO_ZUWACHS = 0.015;
+        const KAUFNEBENKOSTEN_FAKTOR = 0.075;
         const JAHRE_BIS_BAFOEG = 15;
+        const BAFOEG_DAUER = 5;
+        const BAFOEG_BETRAG = 800; // Heutiger Wert
         const JAHRE_BIS_RENTE = 25;
 
-        // Synchronisiert Zahleneingabe und Slider
-        function sync(id, value) {
-            document.getElementById(id + 'Num').value = value;
-            document.getElementById(id + 'Slide').value = value;
-            calculateAndDraw();
-        }
+        // UI Binding Logik
+        const syncPairs = ['zins', 'tilgung', 'sondertilgung', 'etfRendite', 'sparplan', 'miete', 'hausgeld', 'wunschNetto', 'rente1', 'rente2'];
+        
+        syncPairs.forEach(id => {
+            const num = document.getElementById(id + 'Num');
+            const slide = document.getElementById(id + 'Slide');
+            num.addEventListener('input', () => { slide.value = num.value; calculateAndDraw(); });
+            slide.addEventListener('input', () => { num.value = slide.value; calculateAndDraw(); });
+        });
 
-        // Haupt-Logik
+        // Einzelne Inputs anbinden
+        ['kaufpreis', 'sanHaus', 'sanWohnung', 'ek'].forEach(id => {
+            document.getElementById(id).addEventListener('input', calculateAndDraw);
+        });
+
         function calculateAndDraw() {
-            // Werte aus UI lesen
-            const kreditStart = parseFloat(document.getElementById('kreditNum').value);
+            // 1. Projekt Parameter auslesen
+            const szenario = parseInt(document.getElementById('szenario').value);
+            const kaufpreis = parseFloat(document.getElementById('kaufpreis').value) || 0;
+            const sanHaus = parseFloat(document.getElementById('sanHaus').value) || 0;
+            const sanWohnung = parseFloat(document.getElementById('sanWohnung').value) || 0;
+            const eigenkapital = parseFloat(document.getElementById('ek').value) || 0;
+
             const zins = parseFloat(document.getElementById('zinsNum').value) / 100;
             const tilgung = parseFloat(document.getElementById('tilgungNum').value) / 100;
             const sondertilgung = parseFloat(document.getElementById('sondertilgungNum').value);
-            const immoZuwachs = parseFloat(document.getElementById('immoZuwachsNum').value) / 100;
-            const sparplan = parseFloat(document.getElementById('sparplanNum').value);
             const etfRendite = parseFloat(document.getElementById('etfRenditeNum').value) / 100;
-            const inflation = parseFloat(document.getElementById('inflationNum').value) / 100;
+            const sparplan = parseFloat(document.getElementById('sparplanNum').value);
             const mieteHeute = parseFloat(document.getElementById('mieteNum').value);
-            const bafoegBetrag = parseFloat(document.getElementById('bafoegNum').value);
-            const rentenLuecke = parseFloat(document.getElementById('rentenLueckeNum').value);
-            const zusatzEntnahme = parseFloat(document.getElementById('zusatzNum').value);
+            const hausgeldHeute = parseFloat(document.getElementById('hausgeldNum').value);
+            
+            const wunschNetto = parseFloat(document.getElementById('wunschNettoNum').value);
+            const rente1 = parseFloat(document.getElementById('rente1Num').value);
+            const rente2 = parseFloat(document.getElementById('rente2Num').value);
 
-            // Annuität Bank
+            // 2. Finanz-Logik berechnen (Darlehen & Start-Assets)
+            const nebenkosten = kaufpreis * KAUFNEBENKOSTEN_FAKTOR;
+            let projektkostenBank = kaufpreis + sanHaus;
+            let barreserve = 0;
+
+            if (szenario === 1) {
+                projektkostenBank += sanWohnung; // Bank finanziert alles
+            } else {
+                barreserve = sanWohnung; // Wird aus EK zurückgehalten
+            }
+
+            let ekFuerBank = eigenkapital - nebenkosten - barreserve;
+            let kreditStart = projektkostenBank - Math.max(0, ekFuerBank);
+            if (kreditStart < 0) kreditStart = 0;
+
+            // Startwerte für Vermögen
+            let etfMieten = eigenkapital; 
+            let etfKaufen = 0; // Das EK steckt im Haus. (Wenn ekFuerBank > Projektkosten, gäbe es Rest, ignorieren wir hier für Einfachheit)
+            let immoWert = kaufpreis + sanHaus + sanWohnung;
+
+            // Update UI Badge
+            document.getElementById('darlehenDisplay').innerText = `Darlehen: ${new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(kreditStart)}`;
+
+            // 3. Rentenlücke berechnen (Heutige Kaufkraft)
+            let rentenlueckeHeute = wunschNetto - rente1 - rente2;
+            if (rentenlueckeHeute < 0) rentenlueckeHeute = 0;
+
+            // 4. Laufzeit-Simulation (45 Jahre)
             const annuitaetP_a = kreditStart * (zins + tilgung);
-
-            // Daten-Arrays für Charts
+            
             let labels = [];
             let dataWealthMieten = [];
             let dataWealthKaufen = [];
             let dataRestschuld = [];
-            
             let dataKostenMieten = [];
             let dataKostenKaufen = [];
-
-            // Status-Variablen
             let restschuld = kreditStart;
-            let immoWert = IMMO_STARTWERT;
-            let etfMieten = ETF_START_MIETEN;
-            let etfKaufen = ETF_START_KAUFEN;
 
             for (let year = 0; year <= 45; year++) {
                 labels.push(40 + year);
-
-                let inflationsFaktor = Math.pow(1 + inflation, year);
-                let mieteJahr = mieteHeute * inflationsFaktor * 12;
-                let hausgeldJahr = HAUSGELD_START * inflationsFaktor * 12;
                 
-                // Entnahmen
-                let entnahmeSohn = (year >= JAHRE_BIS_BAFOEG && year < JAHRE_BIS_BAFOEG + 5) ? (bafoegBetrag * inflationsFaktor * 12) : 0;
-                let entnahmeRente = (year >= JAHRE_BIS_RENTE) ? ((rentenLuecke + zusatzEntnahme) * inflationsFaktor * 12) : 0;
+                let infFaktor = Math.pow(1 + INFLATION, year);
+                let mieteJahr = mieteHeute * infFaktor * 12;
+                let hausgeldJahr = hausgeldHeute * infFaktor * 12;
+                
+                // Lebensphasen-Entnahmen
+                let entnahmeSohn = (year >= JAHRE_BIS_BAFOEG && year < JAHRE_BIS_BAFOEG + BAFOEG_DAUER) ? (BAFOEG_BETRAG * infFaktor * 12) : 0;
+                let entnahmeRente = (year >= JAHRE_BIS_RENTE) ? (rentenlueckeHeute * infFaktor * 12) : 0;
                 let aktiverSparplan = (year < JAHRE_BIS_RENTE) ? (sparplan * 12) : 0;
 
                 let kreditCashflow = 0;
 
                 if (year > 0) {
-                    // 1. Kredit abwickeln
+                    // Darlehen tilgen
                     let zinsKosten = restschuld * zins;
                     let tilgungsLeistung = annuitaetP_a - zinsKosten;
                     
@@ -312,23 +317,20 @@
                         let gesamtTilgung = tilgungsLeistung + sondertilgung;
                         if (gesamtTilgung > restschuld) {
                             gesamtTilgung = restschuld;
-                            tilgungsLeistung = restschuld; // Letztes Jahr exakte Anpassung
+                            tilgungsLeistung = restschuld;
                         }
                         restschuld -= gesamtTilgung;
                         kreditCashflow = zinsKosten + gesamtTilgung;
-                    } else {
-                        restschuld = 0;
                     }
 
-                    // 2. Werte updaten
-                    immoWert = immoWert * (1 + immoZuwachs);
+                    immoWert = immoWert * (1 + IMMO_ZUWACHS);
 
-                    // ETF Mieten
+                    // ETF Mieten: Zahlt Miete, spart, entnimmt Rente/Bafög
                     etfMieten = etfMieten * (1 + etfRendite);
                     etfMieten += aktiverSparplan - mieteJahr - entnahmeSohn - entnahmeRente;
                     if(etfMieten < 0) etfMieten = 0;
 
-                    // ETF Kaufen
+                    // ETF Kaufen: Investiert das Budget, das nach Abzug von Kredit & Hausgeld übrig bleibt
                     etfKaufen = etfKaufen * (1 + etfRendite);
                     let verfuegbaresBudget = mieteJahr + aktiverSparplan; 
                     etfKaufen += verfuegbaresBudget - kreditCashflow - hausgeldJahr - entnahmeSohn - entnahmeRente;
@@ -337,112 +339,55 @@
                     kreditCashflow = (restschuld > 0) ? annuitaetP_a + sondertilgung : 0;
                 }
 
-                // Push für Chart 1 (Vermögen)
                 dataWealthMieten.push(Math.round(etfMieten));
                 dataWealthKaufen.push(Math.round(etfKaufen + immoWert - restschuld));
                 dataRestschuld.push(Math.round(restschuld));
-
-                // Push für Chart 2 (Wohnkosten pro Monat)
                 dataKostenMieten.push(Math.round(mieteJahr / 12));
                 dataKostenKaufen.push(Math.round((hausgeldJahr + kreditCashflow) / 12));
             }
 
-            drawWealthChart(labels, dataWealthMieten, dataWealthKaufen, dataRestschuld);
-            drawCashflowChart(labels, dataKostenMieten, dataKostenKaufen);
+            drawCharts(labels, dataWealthMieten, dataWealthKaufen, dataRestschuld, dataKostenMieten, dataKostenKaufen);
         }
 
-        // Währungs-Formatter
-        const currFormatter = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+        const currFmt = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
 
-        function drawWealthChart(labels, dataMieten, dataKaufen, dataRestschuld) {
-            const ctx = document.getElementById('wealthChart').getContext('2d');
+        function drawCharts(labels, wm, wk, dr, cm, ck) {
+            const ctx1 = document.getElementById('wealthChart').getContext('2d');
+            const ctx2 = document.getElementById('cashflowChart').getContext('2d');
+            
             if (wealthChartInstance) wealthChartInstance.destroy();
-
-            wealthChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Gesamtvermögen Kaufen',
-                            data: dataKaufen,
-                            borderColor: '#10b981',
-                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.3
-                        },
-                        {
-                            label: 'Gesamtvermögen Mieten',
-                            data: dataMieten,
-                            borderColor: '#ef4444',
-                            backgroundColor: 'rgba(239, 68, 68, 0.05)',
-                            borderWidth: 2,
-                            fill: true,
-                            tension: 0.3
-                        },
-                        {
-                            label: 'Restschuld Kredit',
-                            data: dataRestschuld,
-                            borderColor: '#94a3b8',
-                            backgroundColor: 'rgba(148, 163, 184, 0.2)',
-                            borderWidth: 2,
-                            borderDash: [5, 5],
-                            fill: true,
-                            tension: 0.1
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: { mode: 'index', intersect: false },
-                    scales: {
-                        y: { ticks: { callback: val => currFormatter.format(val) } },
-                        x: { title: { display: true, text: 'Lebensalter (Jahre)' } }
-                    },
-                    plugins: { tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + currFormatter.format(ctx.parsed.y) } } }
-                }
-            });
-        }
-
-        function drawCashflowChart(labels, dataMieten, dataKaufen) {
-            const ctx = document.getElementById('cashflowChart').getContext('2d');
             if (cashflowChartInstance) cashflowChartInstance.destroy();
 
-            cashflowChartInstance = new Chart(ctx, {
+            const commonOptions = {
+                responsive: true, maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                scales: { y: { ticks: { callback: v => currFmt.format(v) } }, x: { title: { display: true, text: 'Lebensalter (Jahre)' } } },
+                plugins: { tooltip: { callbacks: { label: c => c.dataset.label + ': ' + currFmt.format(c.parsed.y) } } }
+            };
+
+            wealthChartInstance = new Chart(ctx1, {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [
-                        {
-                            label: 'Wohnkosten Mieten (Kaltmiete, mtl.)',
-                            data: dataMieten,
-                            borderColor: '#ef4444',
-                            borderWidth: 2,
-                            tension: 0.3
-                        },
-                        {
-                            label: 'Wohnkosten Kaufen (Kredit + Hausgeld, mtl.)',
-                            data: dataKaufen,
-                            borderColor: '#2563eb',
-                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
-                            stepped: true // Zeigt den Drop beim Kreditende besser
-                        }
+                        { label: 'Gesamtvermögen Kaufen', data: wk, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 3, fill: true, tension: 0.3 },
+                        { label: 'Gesamtvermögen Mieten', data: wm, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.05)', borderWidth: 2, fill: true, tension: 0.3 },
+                        { label: 'Restschuld Kredit', data: dr, borderColor: '#94a3b8', borderDash: [5, 5], borderWidth: 2, fill: false, tension: 0.1 }
                     ]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: { mode: 'index', intersect: false },
-                    scales: {
-                        y: { ticks: { callback: val => currFormatter.format(val) } },
-                        x: { title: { display: true, text: 'Lebensalter (Jahre)' } }
-                    },
-                    plugins: { tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + currFormatter.format(ctx.parsed.y) } } }
-                }
+                options: commonOptions
+            });
+
+            cashflowChartInstance = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Wohnkosten Mieten (mtl.)', data: cm, borderColor: '#ef4444', borderWidth: 2, tension: 0.3 },
+                        { label: 'Wohnkosten Kaufen (mtl.)', data: ck, borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', borderWidth: 3, fill: true, stepped: true }
+                    ]
+                },
+                options: commonOptions
             });
         }
 
