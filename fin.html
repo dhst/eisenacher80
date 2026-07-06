@@ -14,6 +14,8 @@
             --text-muted: #64748b;
             --primary: #2563eb;
             --border: #e2e8f0;
+            --info-bg: #eff6ff;
+            --info-border: #bfdbfe;
         }
 
         * { box-sizing: border-box; }
@@ -60,13 +62,21 @@
 
         .control-section { margin-bottom: 25px; }
         .control-section h3 {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            color: var(--text-muted);
-            border-bottom: 1px solid var(--border);
+            color: var(--primary);
+            border-bottom: 2px solid var(--border);
             padding-bottom: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .help-text {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0;
             margin-bottom: 15px;
+            line-height: 1.4;
         }
 
         .control-group { margin-bottom: 15px; }
@@ -87,6 +97,17 @@
         input[type="range"] { width: 100%; accent-color: var(--primary); cursor: pointer; }
 
         .charts-panel { display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
+        
+        .info-box {
+            background: var(--info-bg);
+            border: 1px solid var(--info-border);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #1e3a8a;
+        }
+
         .chart-card {
             background: var(--panel-bg);
             border-radius: 12px;
@@ -98,7 +119,9 @@
             display: flex;
             flex-direction: column;
         }
-        .chart-card h2 { font-size: 1.1rem; margin: 0 0 15px 0; }
+        .chart-card h2 { font-size: 1.1rem; margin: 0 0 5px 0; }
+        .chart-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px; }
+        
         .canvas-wrapper { position: relative; flex: 1; width: 100%; }
 
         @media (max-width: 1024px) {
@@ -122,10 +145,11 @@
         <div class="controls-panel">
             
             <div class="control-section">
-                <h3>Projekt & Strategie</h3>
+                <h3>1. Projekt & Strategie</h3>
+                <p class="help-text">Legt fest, wie viel Geld ihr euch von der Bank leihen müsst. Je mehr ihr aus eigener Tasche (Eigenkapital) zahlt, desto kleiner wird der Kredit.</p>
                 <select id="szenario" onchange="calculateAndDraw()">
-                    <option value="2">Szenario B: Sanierung Wohnung aus EK (Empfohlen)</option>
-                    <option value="1">Szenario A: Vollfinanzierung über Bank</option>
+                    <option value="2">Szenario B: Sanierung Wohnung aus Barreserve (Empfohlen)</option>
+                    <option value="1">Szenario A: Alles über die Bank finanzieren</option>
                 </select>
 
                 <div class="control-group">
@@ -143,7 +167,8 @@
             </div>
 
             <div class="control-section">
-                <h3>Darlehen & Markt</h3>
+                <h3>2. Wohnkosten & Kredit (Chart 1)</h3>
+                <p class="help-text">Bestimmt eure monatliche Belastung. Die Sondertilgung ist euer "Turbo", um schneller schuldenfrei zu sein. Die Kaltmiete ist der Vergleichswert fürs Mieten.</p>
                 <div class="control-group">
                     <div class="control-header"><label>Zinssatz p.a. (%)</label><input type="number" id="zinsNum" value="3.5" step="0.1"></div>
                     <input type="range" id="zinsSlide" min="0.5" max="8" step="0.1" value="3.5">
@@ -157,39 +182,53 @@
                     <input type="range" id="sondertilgungSlide" min="0" max="15000" step="500" value="2500">
                 </div>
                 <div class="control-group">
-                    <div class="control-header"><label>ETF Rendite p.a. (%)</label><input type="number" id="etfRenditeNum" value="5.0" step="0.1"></div>
-                    <input type="range" id="etfRenditeSlide" min="0" max="10" step="0.1" value="5.0">
+                    <div class="control-header"><label>Hausgeld (Eigentum, €/M)</label><input type="number" id="hausgeldNum" value="350" step="10"></div>
+                    <input type="range" id="hausgeldSlide" min="100" max="1000" step="10" value="350">
+                </div>
+                <div class="control-group">
+                    <div class="control-header"><label>Kaltmiete (Vergleich, €/M)</label><input type="number" id="mieteNum" value="1200" step="50"></div>
+                    <input type="range" id="mieteSlide" min="500" max="3000" step="50" value="1200">
                 </div>
             </div>
 
             <div class="control-section">
-                <h3>Lebensplanung & Wohnkosten</h3>
+                <h3>3. Vermögen & Inflation (Chart 2)</h3>
+                <p class="help-text">Steuert den unteren Chart. Der Sparplan baut euer Aktiendepot (ETF) auf. Die Inflation verteuert zukünftig Miete und Lebenshaltung.</p>
                 <div class="control-group">
                     <div class="control-header"><label>Sparplan (mtl. bis Rente)</label><input type="number" id="sparplanNum" value="2000" step="100"></div>
                     <input type="range" id="sparplanSlide" min="0" max="5000" step="100" value="2000">
                 </div>
                 <div class="control-group">
-                    <div class="control-header"><label>Kaltmiete (Vergleich, €)</label><input type="number" id="mieteNum" value="1200" step="50"></div>
-                    <input type="range" id="mieteSlide" min="500" max="3000" step="50" value="1200">
+                    <div class="control-header"><label>ETF Rendite p.a. (%)</label><input type="number" id="etfRenditeNum" value="5.0" step="0.1"></div>
+                    <input type="range" id="etfRenditeSlide" min="0" max="10" step="0.1" value="5.0">
                 </div>
                 <div class="control-group">
-                    <div class="control-header"><label>Hausgeld (Eigentum, €)</label><input type="number" id="hausgeldNum" value="350" step="10"></div>
-                    <input type="range" id="hausgeldSlide" min="100" max="1000" step="10" value="350">
+                    <div class="control-header"><label>Immo-Wertsteigerung (%)</label><input type="number" id="immoZuwachsNum" value="1.5" step="0.1"></div>
+                    <input type="range" id="immoZuwachsSlide" min="-2" max="5" step="0.1" value="1.5">
+                </div>
+                <div class="control-group">
+                    <div class="control-header"><label>Inflation p.a. (%)</label><input type="number" id="inflationNum" value="2.0" step="0.1"></div>
+                    <input type="range" id="inflationSlide" min="0" max="6" step="0.1" value="2.0">
                 </div>
             </div>
 
             <div class="control-section">
-                <h3>Rente & Einkommen (Heutige Kaufkraft)</h3>
+                <h3>4. Familie & Rente</h3>
+                <p class="help-text">Gibt an, wie viel Geld ihr später zum Leben braucht. Was die Rente nicht deckt, wird automatisch aus eurem ETF-Vermögen "aufgefressen" (inkl. Inflation).</p>
+                <div class="control-group">
+                    <div class="control-header"><label>BAföG-Ersatz mtl. (€)</label><input type="number" id="bafoegNum" value="800" step="50"></div>
+                    <input type="range" id="bafoegSlide" min="0" max="2000" step="50" value="800">
+                </div>
                 <div class="control-group">
                     <div class="control-header"><label>Wunsch-Haushaltsnetto (€)</label><input type="number" id="wunschNettoNum" value="4500" step="100"></div>
                     <input type="range" id="wunschNettoSlide" min="2000" max="10000" step="100" value="4500">
                 </div>
                 <div class="control-group">
-                    <div class="control-header"><label>Gesetzl. Rente Partner 1 (€)</label><input type="number" id="rente1Num" value="2000" step="100"></div>
+                    <div class="control-header"><label>Gesetzl. Rente Mann (€)</label><input type="number" id="rente1Num" value="2000" step="100"></div>
                     <input type="range" id="rente1Slide" min="0" max="4000" step="100" value="2000">
                 </div>
                 <div class="control-group">
-                    <div class="control-header"><label>Gesetzl. Rente Partner 2 (€)</label><input type="number" id="rente2Num" value="1500" step="100"></div>
+                    <div class="control-header"><label>Gesetzl. Rente Frau (€)</label><input type="number" id="rente2Num" value="1500" step="100"></div>
                     <input type="range" id="rente2Slide" min="0" max="4000" step="100" value="1500">
                 </div>
             </div>
@@ -197,14 +236,24 @@
 
         <!-- Charts Area -->
         <div class="charts-panel">
-            <div class="chart-card">
-                <h2>Gesamtvermögen & Restschuld (Alter 40 bis 85)</h2>
-                <div class="canvas-wrapper"><canvas id="wealthChart"></canvas></div>
+            
+            <div class="info-box">
+                <strong>Wie dieses Tool rechnet (Der Raketeneffekt):</strong> Um fair zu vergleichen, nimmt das Tool an, dass ihr in *beiden* Szenarien exakt gleich viel Geld im Monat ausgebt (Miete + Sparplan). 
+                Sobald euer Immobilienkredit abbezahlt ist, habt ihr als Käufer plötzlich jeden Monat sehr viel Geld übrig, weil die Kreditrate wegfällt. Das Tool investiert dieses "übrige" Geld dann sofort mit in euren Aktien-ETF. Deshalb schießt das Vermögen beim Kaufen ab dem Tag der Schuldenfreiheit steil nach oben.
             </div>
+
             <div class="chart-card">
-                <h2>Zahlungsströme: Monatliche Wohnkosten & Liquiditätsbedarf</h2>
+                <h2>1. Monatliche Wohnkosten & Liquiditätsabfluss</h2>
+                <div class="chart-desc">Zeigt, wie viel Geld jeden Monat für das "Dach über dem Kopf" abfließt. Die rote Miete steigt durch Inflation stetig an. Die blaue Kauf-Kurve fällt radikal ab, sobald der Kredit abbezahlt ist.</div>
                 <div class="canvas-wrapper"><canvas id="cashflowChart"></canvas></div>
             </div>
+
+            <div class="chart-card">
+                <h2>2. Gesamtvermögen (Immobilie + ETF) & Restschuld</h2>
+                <div class="chart-desc">Zeigt euer echtes Netto-Vermögen über die Zeit. Im Alter (ab 65) flacht die Kurve ab oder sinkt, weil das Tool dann Geld aus dem Depot entnimmt, um eure Rentenlücke zu schließen.</div>
+                <div class="canvas-wrapper"><canvas id="wealthChart"></canvas></div>
+            </div>
+
         </div>
     </div>
 
@@ -212,17 +261,12 @@
         let wealthChartInstance = null;
         let cashflowChartInstance = null;
 
-        // Feste Projekt-Parameter
-        const INFLATION = 0.02;
-        const IMMO_ZUWACHS = 0.015;
         const KAUFNEBENKOSTEN_FAKTOR = 0.075;
         const JAHRE_BIS_BAFOEG = 15;
         const BAFOEG_DAUER = 5;
-        const BAFOEG_BETRAG = 800; // Heutiger Wert
         const JAHRE_BIS_RENTE = 25;
 
-        // UI Binding Logik
-        const syncPairs = ['zins', 'tilgung', 'sondertilgung', 'etfRendite', 'sparplan', 'miete', 'hausgeld', 'wunschNetto', 'rente1', 'rente2'];
+        const syncPairs = ['zins', 'tilgung', 'sondertilgung', 'hausgeld', 'miete', 'sparplan', 'etfRendite', 'immoZuwachs', 'inflation', 'bafoeg', 'wunschNetto', 'rente1', 'rente2'];
         
         syncPairs.forEach(id => {
             const num = document.getElementById(id + 'Num');
@@ -231,59 +275,61 @@
             slide.addEventListener('input', () => { num.value = slide.value; calculateAndDraw(); });
         });
 
-        // Einzelne Inputs anbinden
         ['kaufpreis', 'sanHaus', 'sanWohnung', 'ek'].forEach(id => {
             document.getElementById(id).addEventListener('input', calculateAndDraw);
         });
 
         function calculateAndDraw() {
-            // 1. Projekt Parameter auslesen
+            // Projekt Parameter
             const szenario = parseInt(document.getElementById('szenario').value);
             const kaufpreis = parseFloat(document.getElementById('kaufpreis').value) || 0;
             const sanHaus = parseFloat(document.getElementById('sanHaus').value) || 0;
             const sanWohnung = parseFloat(document.getElementById('sanWohnung').value) || 0;
             const eigenkapital = parseFloat(document.getElementById('ek').value) || 0;
 
+            // Zinsen & Raten
             const zins = parseFloat(document.getElementById('zinsNum').value) / 100;
             const tilgung = parseFloat(document.getElementById('tilgungNum').value) / 100;
             const sondertilgung = parseFloat(document.getElementById('sondertilgungNum').value);
-            const etfRendite = parseFloat(document.getElementById('etfRenditeNum').value) / 100;
-            const sparplan = parseFloat(document.getElementById('sparplanNum').value);
-            const mieteHeute = parseFloat(document.getElementById('mieteNum').value);
-            const hausgeldHeute = parseFloat(document.getElementById('hausgeldNum').value);
             
+            // Markt & Wohnen
+            const hausgeldHeute = parseFloat(document.getElementById('hausgeldNum').value);
+            const mieteHeute = parseFloat(document.getElementById('mieteNum').value);
+            const sparplan = parseFloat(document.getElementById('sparplanNum').value);
+            const etfRendite = parseFloat(document.getElementById('etfRenditeNum').value) / 100;
+            const immoZuwachs = parseFloat(document.getElementById('immoZuwachsNum').value) / 100;
+            const inflation = parseFloat(document.getElementById('inflationNum').value) / 100;
+            
+            // Leben & Rente
+            const bafoegBetrag = parseFloat(document.getElementById('bafoegNum').value);
             const wunschNetto = parseFloat(document.getElementById('wunschNettoNum').value);
             const rente1 = parseFloat(document.getElementById('rente1Num').value);
             const rente2 = parseFloat(document.getElementById('rente2Num').value);
 
-            // 2. Finanz-Logik berechnen (Darlehen & Start-Assets)
+            // Finanz-Logik berechnen
             const nebenkosten = kaufpreis * KAUFNEBENKOSTEN_FAKTOR;
             let projektkostenBank = kaufpreis + sanHaus;
             let barreserve = 0;
 
             if (szenario === 1) {
-                projektkostenBank += sanWohnung; // Bank finanziert alles
+                projektkostenBank += sanWohnung;
             } else {
-                barreserve = sanWohnung; // Wird aus EK zurückgehalten
+                barreserve = sanWohnung;
             }
 
             let ekFuerBank = eigenkapital - nebenkosten - barreserve;
             let kreditStart = projektkostenBank - Math.max(0, ekFuerBank);
             if (kreditStart < 0) kreditStart = 0;
 
-            // Startwerte für Vermögen
             let etfMieten = eigenkapital; 
-            let etfKaufen = 0; // Das EK steckt im Haus. (Wenn ekFuerBank > Projektkosten, gäbe es Rest, ignorieren wir hier für Einfachheit)
+            let etfKaufen = 0; 
             let immoWert = kaufpreis + sanHaus + sanWohnung;
 
-            // Update UI Badge
             document.getElementById('darlehenDisplay').innerText = `Darlehen: ${new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(kreditStart)}`;
 
-            // 3. Rentenlücke berechnen (Heutige Kaufkraft)
             let rentenlueckeHeute = wunschNetto - rente1 - rente2;
             if (rentenlueckeHeute < 0) rentenlueckeHeute = 0;
 
-            // 4. Laufzeit-Simulation (45 Jahre)
             const annuitaetP_a = kreditStart * (zins + tilgung);
             
             let labels = [];
@@ -297,19 +343,17 @@
             for (let year = 0; year <= 45; year++) {
                 labels.push(40 + year);
                 
-                let infFaktor = Math.pow(1 + INFLATION, year);
+                let infFaktor = Math.pow(1 + inflation, year);
                 let mieteJahr = mieteHeute * infFaktor * 12;
                 let hausgeldJahr = hausgeldHeute * infFaktor * 12;
                 
-                // Lebensphasen-Entnahmen
-                let entnahmeSohn = (year >= JAHRE_BIS_BAFOEG && year < JAHRE_BIS_BAFOEG + BAFOEG_DAUER) ? (BAFOEG_BETRAG * infFaktor * 12) : 0;
+                let entnahmeSohn = (year >= JAHRE_BIS_BAFOEG && year < JAHRE_BIS_BAFOEG + BAFOEG_DAUER) ? (bafoegBetrag * infFaktor * 12) : 0;
                 let entnahmeRente = (year >= JAHRE_BIS_RENTE) ? (rentenlueckeHeute * infFaktor * 12) : 0;
                 let aktiverSparplan = (year < JAHRE_BIS_RENTE) ? (sparplan * 12) : 0;
 
                 let kreditCashflow = 0;
 
                 if (year > 0) {
-                    // Darlehen tilgen
                     let zinsKosten = restschuld * zins;
                     let tilgungsLeistung = annuitaetP_a - zinsKosten;
                     
@@ -323,14 +367,12 @@
                         kreditCashflow = zinsKosten + gesamtTilgung;
                     }
 
-                    immoWert = immoWert * (1 + IMMO_ZUWACHS);
+                    immoWert = immoWert * (1 + immoZuwachs);
 
-                    // ETF Mieten: Zahlt Miete, spart, entnimmt Rente/Bafög
                     etfMieten = etfMieten * (1 + etfRendite);
                     etfMieten += aktiverSparplan - mieteJahr - entnahmeSohn - entnahmeRente;
                     if(etfMieten < 0) etfMieten = 0;
 
-                    // ETF Kaufen: Investiert das Budget, das nach Abzug von Kredit & Hausgeld übrig bleibt
                     etfKaufen = etfKaufen * (1 + etfRendite);
                     let verfuegbaresBudget = mieteJahr + aktiverSparplan; 
                     etfKaufen += verfuegbaresBudget - kreditCashflow - hausgeldJahr - entnahmeSohn - entnahmeRente;
@@ -365,6 +407,18 @@
                 plugins: { tooltip: { callbacks: { label: c => c.dataset.label + ': ' + currFmt.format(c.parsed.y) } } }
             };
 
+            cashflowChartInstance = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Wohnkosten Mieten (mtl.)', data: cm, borderColor: '#ef4444', borderWidth: 2, tension: 0.3 },
+                        { label: 'Wohnkosten Kaufen (mtl.)', data: ck, borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', borderWidth: 3, fill: true, stepped: true }
+                    ]
+                },
+                options: commonOptions
+            });
+
             wealthChartInstance = new Chart(ctx1, {
                 type: 'line',
                 data: {
@@ -373,18 +427,6 @@
                         { label: 'Gesamtvermögen Kaufen', data: wk, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 3, fill: true, tension: 0.3 },
                         { label: 'Gesamtvermögen Mieten', data: wm, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.05)', borderWidth: 2, fill: true, tension: 0.3 },
                         { label: 'Restschuld Kredit', data: dr, borderColor: '#94a3b8', borderDash: [5, 5], borderWidth: 2, fill: false, tension: 0.1 }
-                    ]
-                },
-                options: commonOptions
-            });
-
-            cashflowChartInstance = new Chart(ctx2, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        { label: 'Wohnkosten Mieten (mtl.)', data: cm, borderColor: '#ef4444', borderWidth: 2, tension: 0.3 },
-                        { label: 'Wohnkosten Kaufen (mtl.)', data: ck, borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', borderWidth: 3, fill: true, stepped: true }
                     ]
                 },
                 options: commonOptions
