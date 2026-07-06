@@ -218,6 +218,10 @@
                     <div class="control-header"><label>Gesetzl. Rente Frau (€)</label><input type="number" id="rente2Num" value="1500" step="100"></div>
                     <input type="range" id="rente2Slide" min="0" max="4000" step="100" value="1500">
                 </div>
+                <div class="control-group">
+                    <div class="control-header"><label>Zusatzentnahme (Pflege/Luxus)</label><input type="number" id="zusatzEntnahmeNum" value="0" step="100"></div>
+                    <input type="range" id="zusatzEntnahmeSlide" min="0" max="3000" step="100" value="0">
+                </div>
             </div>
         </div>
 
@@ -225,9 +229,10 @@
         <div class="charts-panel">
             
             <div class="info-box">
-                <strong>Methodik der Simulation:</strong><br>
-                <strong>Mieten:</strong> Das verfügbare Eigenkapital wird vollständig im ETF angelegt. Die eingestellte Sparrate wird monatlich in voller Höhe hinzugefügt. Miete wird als separater Kostenblock betrachtet.<br>
-                <strong>Kaufen:</strong> Das Eigenkapital fließt in Kaufnebenkosten, Sanierung und Darlehenstilgung. In den ETF fließt <em>maximal</em> die festgelegte Sparrate. Liegt die monatliche Belastung aus Kredit und Hausgeld über der Vergleichsmiete, wird die ETF-Sparrate um diese Differenz gekürzt. 
+                <strong>Methodik der Simulation (Haushaltsbudget):</strong><br>
+                Vor dem Renteneintritt verfügt ihr jeden Monat über ein fiktives Gesamtbudget in Höhe von <em>Kaltmiete heute + Sparplan</em>. <br>
+                <strong>Mieten:</strong> Aus dem Budget wird die (durch Inflation steigende) Miete gezahlt. Der Rest geht in den ETF. Das ETF-Wachstum frisst sich also bei hoher Inflation langsam auf. Im Rentenalter wird die volle Miete + Rentenlücke aus dem ETF abgezogen.<br>
+                <strong>Kaufen:</strong> Aus dem Budget werden Kredit und Hausgeld gezahlt. Der Rest geht in den ETF (ist aber auf eure eingestellte Sparrate nach oben <strong>gedeckelt</strong>). Im Rentenalter wird das Hausgeld + Rentenlücke aus dem ETF entnommen.
             </div>
 
             <div class="chart-card">
@@ -252,7 +257,7 @@
         const BAFOEG_DAUER = 5;
         const JAHRE_BIS_RENTE = 25;
 
-        const syncPairs = ['zins', 'tilgung', 'sondertilgung', 'hausgeld', 'miete', 'sparplan', 'etfRendite', 'immoZuwachs', 'inflation', 'bafoeg', 'wunschNetto', 'rente1', 'rente2'];
+        const syncPairs = ['zins', 'tilgung', 'sondertilgung', 'hausgeld', 'miete', 'sparplan', 'etfRendite', 'immoZuwachs', 'inflation', 'bafoeg', 'wunschNetto', 'rente1', 'rente2', 'zusatzEntnahme'];
         
         syncPairs.forEach(id => {
             const num = document.getElementById(id + 'Num');
@@ -288,6 +293,7 @@
             const wunschNetto = parseFloat(document.getElementById('wunschNettoNum').value);
             const rente1 = parseFloat(document.getElementById('rente1Num').value);
             const rente2 = parseFloat(document.getElementById('rente2Num').value);
+            const zusatzEntnahme = parseFloat(document.getElementById('zusatzEntnahmeNum').value);
 
             // Finanz-Logik Startwerte
             const nebenkosten = kaufpreis * KAUFNEBENKOSTEN_FAKTOR;
@@ -313,6 +319,9 @@
             let rentenlueckeHeute = Math.max(0, wunschNetto - rente1 - rente2);
             const annuitaetP_a = kreditStart * (zins + tilgung);
             
+            // Das feste Haushaltsbudget in der Einkommensphase
+            const haushaltsBudgetMtl = mieteHeute + sparplan;
+            
             let labels = [];
             let dataWealthMieten = [];
             let dataWealthKaufen = [];
@@ -329,8 +338,8 @@
                 let hausgeldJahr = hausgeldHeute * infFaktor * 12;
                 
                 let entnahmeSohn = (year >= JAHRE_BIS_BAFOEG && year < JAHRE_BIS_BAFOEG + BAFOEG_DAUER) ? (bafoegBetrag * infFaktor * 12) : 0;
-                let entnahmeRente = (year >= JAHRE_BIS_RENTE) ? (rentenlueckeHeute * infFaktor * 12) : 0;
-                let aktiverSparplan = (year < JAHRE_BIS_RENTE) ? (sparplan * 12) : 0;
+                let entnahmeRente = (year >= JAHRE_BIS_RENTE) ? ((rentenlueckeHeute + zusatzEntnahme) * infFaktor * 12) : 0;
+                let istInRente = year >= JAHRE_BIS_RENTE;
 
                 let kreditCashflow = 0;
 
@@ -352,19 +361,33 @@
 
                     // ETF Mieten
                     etfMieten = etfMieten * (1 + etfRendite);
-                    etfMieten += aktiverSparplan - entnahmeSohn - entnahmeRente;
+                    if (!istInRente) {
+                        // Budget abzgl. Miete geht in ETF
+                        let sparrateMieten = (haushaltsBudgetMtl * 12) - mieteJahr;
+                        etfMieten += sparrateMieten - entnahmeSohn;
+                    } else {
+                        // In der Rente: Keine Einzahlung, Miete und Rentenlücke werden abgezogen
+                        etfMieten -= mieteJahr + entnahmeRente + entnahmeSohn;
+                    }
                     if(etfMieten < 0) etfMieten = 0;
 
                     // ETF Kaufen
-                    let mehrbelastungKauf = (kreditCashflow + hausgeldJahr) - mieteJahr;
-                    let etfInputKauf = aktiverSparplan - mehrbelastungKauf;
-                    if (etfInputKauf > aktiverSparplan) {
-                        etfInputKauf = aktiverSparplan; // Capping auf maximale Sparrate
-                    }
-
                     etfKaufen = etfKaufen * (1 + etfRendite);
-                    etfKaufen += etfInputKauf - entnahmeSohn - entnahmeRente;
+                    if (!istInRente) {
+                        let wohnkostenKauf = kreditCashflow + hausgeldJahr;
+                        let sparrateKaufen = (haushaltsBudgetMtl * 12) - wohnkostenKauf;
+                        
+                        // Deckelung auf die eingestellte Sparrate!
+                        if (sparrateKaufen > sparplan * 12) {
+                            sparrateKaufen = sparplan * 12;
+                        }
+                        etfKaufen += sparrateKaufen - entnahmeSohn;
+                    } else {
+                        // In der Rente: Wohnkosten (Hausgeld + Restkredit) und Rente werden entnommen
+                        etfKaufen -= (kreditCashflow + hausgeldJahr) + entnahmeRente + entnahmeSohn;
+                    }
                     if(etfKaufen < 0) etfKaufen = 0;
+                    
                 } else {
                     kreditCashflow = (restschuld > 0) ? annuitaetP_a + sondertilgung : 0;
                 }
