@@ -37,6 +37,15 @@
         .chart-card { background: var(--panel-bg); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid var(--border); flex: 1; min-height: 350px; display: flex; flex-direction: column; }
         .chart-card h2 { font-size: 1.1rem; margin: 0 0 15px 0; }
         .canvas-wrapper { position: relative; flex: 1; width: 100%; }
+        
+        /* Styles für die Experten-Einstellungen */
+        .expert-settings { background: var(--bg-color); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 25px; }
+        .expert-settings summary { font-weight: 600; font-size: 0.9rem; color: var(--text-muted); cursor: pointer; outline: none; }
+        .expert-settings[open] summary { margin-bottom: 15px; color: var(--primary); border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+        .expert-settings .control-group { margin-bottom: 10px; }
+        .expert-settings .control-header label { font-size: 0.85rem; color: var(--text-muted); }
+        .expert-settings .control-header input[type="number"] { padding: 2px 6px; width: 80px; }
+
         @media (max-width: 1024px) { .dashboard { grid-template-columns: 1fr; } body { height: auto; display: block; } .charts-panel { overflow: visible; } }
     </style>
 </head>
@@ -52,6 +61,28 @@
     <div class="dashboard">
         <div class="controls-panel">
             
+            <details class="expert-settings">
+                <summary>⚙️ Erweiterte Parameter</summary>
+                <div class="control-group">
+                    <div class="control-header"><label>Startjahr Simulation</label><input type="number" id="startJahrNum" value="2026"></div>
+                </div>
+                <div class="control-group">
+                    <div class="control-header"><label>Start-Alter</label><input type="number" id="startAlterNum" value="40"></div>
+                </div>
+                <div class="control-group">
+                    <div class="control-header"><label>Kaufnebenkosten (%)</label><input type="number" id="nebenkostenNum" value="7.5" step="0.1"></div>
+                </div>
+                <div class="control-group">
+                    <div class="control-header"><label>Jahre bis BAföG-Start</label><input type="number" id="jahreBisBafoegNum" value="15"></div>
+                </div>
+                <div class="control-group">
+                    <div class="control-header"><label>Dauer BAföG (Jahre)</label><input type="number" id="bafoegDauerNum" value="5"></div>
+                </div>
+                <div class="control-group">
+                    <div class="control-header"><label>Jahre bis Renteneintritt</label><input type="number" id="jahreBisRenteNum" value="25"></div>
+                </div>
+            </details>
+
             <div class="control-section">
                 <h3>1. Projekt & Strategie</h3>
                 <select id="szenario" onchange="calculateAndDraw()">
@@ -152,7 +183,7 @@
             </div>
 
             <div class="chart-card">
-                <h2>1. Monatliche Wohnkosten & Liquiditätsabfluss (ab 2026)</h2>
+                <h2>1. Monatliche Wohnkosten & Liquiditätsabfluss</h2>
                 <div class="canvas-wrapper"><canvas id="cashflowChart"></canvas></div>
             </div>
 
@@ -173,19 +204,11 @@
         let wealthChartInstance = null;
         let cashflowChartInstance = null;
         
-        // Globale Arrays für die Tooltips
         let arrImmoKauf = [];
         let arrEtfKauf = [];
         let arrRestschuld = [];
         let arrSparMieteMtl = [];
         let arrSparKaufMtl = [];
-
-        const KAUFNEBENKOSTEN_FAKTOR = 0.075;
-        const JAHRE_BIS_BAFOEG = 15;
-        const BAFOEG_DAUER = 5;
-        const JAHRE_BIS_RENTE = 25;
-        const START_JAHR = 2026;
-        const START_ALTER = 40;
 
         const syncPairs = ['zins', 'tilgung', 'sondertilgung', 'hausgeld', 'miete', 'sparplan', 'etfRendite', 'immoZuwachs', 'inflation', 'bafoeg', 'wunschNetto', 'rente1', 'rente2', 'zusatzEntnahme'];
         
@@ -198,7 +221,8 @@
             }
         });
 
-        ['kaufpreis', 'sanHaus', 'sanWohnung', 'ek', 'szenario'].forEach(id => {
+        // Alle manuellen Inputs anbinden
+        ['kaufpreis', 'sanHaus', 'sanWohnung', 'ek', 'szenario', 'startJahrNum', 'startAlterNum', 'nebenkostenNum', 'jahreBisBafoegNum', 'bafoegDauerNum', 'jahreBisRenteNum'].forEach(id => {
             let el = document.getElementById(id);
             if(el) el.addEventListener('input', calculateAndDraw);
         });
@@ -211,6 +235,14 @@
             arrRestschuld = [];
             arrSparMieteMtl = [];
             arrSparKaufMtl = [];
+
+            // Erweiterte Parameter (Experten)
+            const startJahr = parseInt(document.getElementById('startJahrNum').value) || 2026;
+            const startAlter = parseInt(document.getElementById('startAlterNum').value) || 40;
+            const nebenkostenFaktor = (parseFloat(document.getElementById('nebenkostenNum').value) || 0) / 100;
+            const jahreBisBafoeg = parseInt(document.getElementById('jahreBisBafoegNum').value) || 15;
+            const bafoegDauer = parseInt(document.getElementById('bafoegDauerNum').value) || 5;
+            const jahreBisRente = parseInt(document.getElementById('jahreBisRenteNum').value) || 25;
 
             const szenario = parseInt(document.getElementById('szenario').value) || 2;
             const kaufpreis = parseFloat(document.getElementById('kaufpreis').value) || 0;
@@ -235,7 +267,7 @@
             const rente2 = parseFloat(document.getElementById('rente2Num').value) || 0;
             const zusatzEntnahme = parseFloat(document.getElementById('zusatzEntnahmeNum').value) || 0;
 
-            const nebenkosten = kaufpreis * KAUFNEBENKOSTEN_FAKTOR;
+            const nebenkosten = kaufpreis * nebenkostenFaktor;
             let projektkostenBank = kaufpreis + sanHaus;
             let barreserve = 0;
 
@@ -268,16 +300,15 @@
             let restschuld = kreditStart;
 
             for (let year = 0; year <= 45; year++) {
-                // X-Achse: Kalenderjahr
-                labels.push(START_JAHR + year);
+                labels.push(startJahr + year);
                 
                 let infFaktor = Math.pow(1 + inflation, year);
                 let mieteJahr = mieteHeute * infFaktor * 12;
                 let hausgeldJahr = hausgeldHeute * infFaktor * 12;
                 
-                let entnahmeSohn = (year >= JAHRE_BIS_BAFOEG && year < JAHRE_BIS_BAFOEG + BAFOEG_DAUER) ? (bafoegBetrag * infFaktor * 12) : 0;
-                let entnahmeRente = (year >= JAHRE_BIS_RENTE) ? ((rentenlueckeHeute + zusatzEntnahme) * infFaktor * 12) : 0;
-                let istInRente = year >= JAHRE_BIS_RENTE;
+                let entnahmeSohn = (year >= jahreBisBafoeg && year < jahreBisBafoeg + bafoegDauer) ? (bafoegBetrag * infFaktor * 12) : 0;
+                let entnahmeRente = (year >= jahreBisRente) ? ((rentenlueckeHeute + zusatzEntnahme) * infFaktor * 12) : 0;
+                let istInRente = year >= jahreBisRente;
 
                 let kreditCashflow = 0;
                 let sparrateMietenAktuell = 0;
@@ -325,10 +356,8 @@
                     sparrateKaufenAktuell = sparplan * 12;
                 }
 
-                // Werte für die Tooltips speichern (Monats-Werte)
                 arrSparMieteMtl.push(sparrateMietenAktuell / 12);
                 arrSparKaufMtl.push(sparrateKaufenAktuell / 12);
-
                 arrImmoKauf.push(immoWert);
                 arrEtfKauf.push(etfKaufen);
                 arrRestschuld.push(restschuld);
@@ -340,22 +369,21 @@
                 dataKostenKaufen.push(Math.round((hausgeldJahr + kreditCashflow) / 12));
             }
 
-            drawCharts(labels, dataWealthMieten, dataWealthKaufen, dataRestschuld, dataKostenMieten, dataKostenKaufen);
+            drawCharts(labels, dataWealthMieten, dataWealthKaufen, dataRestschuld, dataKostenMieten, dataKostenKaufen, startJahr, startAlter);
         }
 
         const currFmt = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
 
-        function drawCharts(labels, wm, wk, dr, cm, ck) {
+        function drawCharts(labels, wm, wk, dr, cm, ck, startJahr, startAlter) {
             const ctx1 = document.getElementById('wealthChart').getContext('2d');
             const ctx2 = document.getElementById('cashflowChart').getContext('2d');
             
             if (wealthChartInstance) wealthChartInstance.destroy();
             if (cashflowChartInstance) cashflowChartInstance.destroy();
 
-            // Titel für Tooltip generieren (Jahr + Alter)
             const titleCallback = function(context) {
-                let year = context[0].label;
-                let age = parseInt(year) - START_JAHR + START_ALTER;
+                let year = parseInt(context[0].label);
+                let age = year - startJahr + startAlter;
                 return `Jahr ${year} (Alter: ${age} Jahre)`;
             };
 
@@ -437,7 +465,6 @@
             });
         }
 
-        // Init initial run
         calculateAndDraw();
     </script>
 </body>
