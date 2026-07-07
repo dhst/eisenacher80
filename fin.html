@@ -32,7 +32,6 @@
             overflow: hidden;
         }
 
-        /* Eigene schlanke Scrollbars */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
@@ -324,7 +323,6 @@
         let cRentCash = null, cRentWealth = null;
         let arrImmoKauf = [], arrEtfKauf = [], arrEtfMiete = [];
         
-        // Alle Parameter für den URL-Sync
         const allParams = [
             'szenario', 'startJahrNum', 'nebenkostenNum', 'kaufpreis', 'sanHaus', 'sanWohnung', 'ek',
             'alterMannNum', 'alterFrauNum', 'renteMannAlterNum', 'renteFrauAlterNum', 'sohnGeburtsjahrNum', 'bafoegDauerNum', 'bafoegNum',
@@ -335,7 +333,6 @@
 
         const syncPairs = ['zins', 'tilgung', 'sondertilgung', 'hausgeld', 'miete', 'sparplan', 'etfRendite', 'immoZuwachs', 'inflation', 'bafoeg', 'wunschNetto', 'rente1', 'rente2', 'zusatzEntnahme', 'steuer'];
         
-        // Initiale Event Listener
         syncPairs.forEach(id => {
             const num = document.getElementById(id + 'Num');
             const slide = document.getElementById(id + 'Slide');
@@ -351,25 +348,9 @@
             if(el) el.addEventListener('input', calculateAndDraw);
         });
 
-        // URL State Logik
-        function updateURL() {
-            const params = new URLSearchParams();
-            allParams.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    if (el.type === 'checkbox') {
-                        params.set(id, el.checked ? '1' : '0');
-                    } else {
-                        params.set(id, el.value);
-                    }
-                }
-            });
-            window.history.replaceState({}, '', `${location.pathname}?${params.toString()}`);
-        }
-
         function loadFromURL() {
             const params = new URLSearchParams(window.location.search);
-            if (Array.from(params).length === 0) return; // Nichts in der URL
+            if (Array.from(params).length === 0) return;
 
             allParams.forEach(id => {
                 if (params.has(id)) {
@@ -379,7 +360,6 @@
                             el.checked = params.get(id) === '1';
                         } else {
                             el.value = params.get(id);
-                            // Falls es einen dazugehörigen Slider gibt, diesen auch updaten
                             const slide = document.getElementById(id.replace('Num', 'Slide'));
                             if (slide) slide.value = el.value;
                         }
@@ -389,10 +369,21 @@
         }
 
         function copyUrlToClipboard() {
-            navigator.clipboard.writeText(window.location.href).then(() => {
+            const params = new URLSearchParams();
+            allParams.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (el.type === 'checkbox') params.set(id, el.checked ? '1' : '0');
+                    else params.set(id, el.value);
+                }
+            });
+            const newUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+            window.history.replaceState({}, '', newUrl);
+            
+            navigator.clipboard.writeText(newUrl).then(() => {
                 const btn = document.getElementById('copyLinkBtn');
                 const originalHtml = btn.innerHTML;
-                btn.innerHTML = '✅ Kopiert!';
+                btn.innerHTML = '✅ Link kopiert!';
                 btn.style.color = '#10b981';
                 setTimeout(() => {
                     btn.innerHTML = originalHtml;
@@ -404,9 +395,6 @@
         function calculateAndDraw() {
             if (typeof Chart === 'undefined') return;
             
-            // State in URL updaten
-            updateURL();
-
             arrImmoKauf = []; arrEtfKauf = []; arrEtfMiete = [];
 
             const startJahr = parseInt(document.getElementById('startJahrNum').value) || 2026;
@@ -487,19 +475,21 @@
                 
                 let isMannInRente = alterMann >= renteMannAlter;
                 let isFrauInRente = alterFrau >= renteFrauAlter;
-                
                 let anteilArbeitend = (!isMannInRente ? 0.5 : 0) + (!isFrauInRente ? 0.5 : 0);
                 
-                let ersatzEinkommen = (isMannInRente ? rente1 : wunschNetto/2) + (isFrauInRente ? rente2 : wunschNetto/2);
-                let rentenlueckeHeute = Math.max(0, wunschNetto - ersatzEinkommen);
-
+                // NEUE BILANZ-LOGIK: Einkommen vs. Ausgaben
+                let lebenshaltungKosten = (wunschNetto - mieteHeute) * 12 * infFaktor;
+                let haushaltEinkommenArbeitHeute = wunschNetto + sparplanHeute;
+                
+                let einkommenMannArbeit = (haushaltEinkommenArbeitHeute / 2) * 12 * infFaktor * (isMannInRente ? 0 : 1);
+                let einkommenFrauArbeit = (haushaltEinkommenArbeitHeute / 2) * 12 * infFaktor * (isFrauInRente ? 0 : 1);
+                let renteMannEinkommen = rente1 * 12 * infFaktor * (isMannInRente ? 1 : 0);
+                let renteFrauEinkommen = rente2 * 12 * infFaktor * (isFrauInRente ? 1 : 0);
+                
+                let totalIncomeJahr = einkommenMannArbeit + einkommenFrauArbeit + renteMannEinkommen + renteFrauEinkommen;
+                
+                let zusatzEntnahmeJahr = zusatzEntnahme * 12 * infFaktor * (1 - anteilArbeitend);
                 let bafoegJahr = (alterSohn >= bafoegStartAlter && alterSohn < bafoegStartAlter + bafoegDauer) ? (bafoegBetrag * 12 * infFaktor) : 0;
-                
-                let budgetJahr = (mieteHeute + sparplanHeute) * 12 * infFaktor * anteilArbeitend;
-                let maxSparplanJahr = (sparplanHeute * 12) * infFaktor * anteilArbeitend;
-                
-                let entnahmeRente = rentenlueckeHeute * 12 * infFaktor;
-                let entnahmeZusatz = zusatzEntnahme * 12 * infFaktor * (1 - anteilArbeitend);
 
                 let kreditCashflow = 0;
                 if (yearOffset > 0) {
@@ -519,8 +509,8 @@
                 let wohnkostenKauf = kreditCashflow + hausgeldJahr;
                 
                 // --- ETF FLOW MIETEN ---
-                let sparrateMiete = budgetJahr - mieteJahr;
-                let etfFlowMiete = sparrateMiete - entnahmeRente - entnahmeZusatz - bafoegJahr;
+                let requiredCashMiete = lebenshaltungKosten + mieteJahr + bafoegJahr + zusatzEntnahmeJahr;
+                let etfFlowMiete = totalIncomeJahr - requiredCashMiete;
                 
                 if (yearOffset > 0) {
                     if (etfMieten > 0) etfMieten *= (1 + etfRendite);
@@ -545,9 +535,8 @@
                 }
 
                 // --- ETF FLOW KAUFEN ---
-                let sparrateKauf = budgetJahr - wohnkostenKauf;
-                if (sparrateKauf > maxSparplanJahr) { sparrateKauf = maxSparplanJahr; }
-                let etfFlowKauf = sparrateKauf - entnahmeRente - entnahmeZusatz - bafoegJahr;
+                let requiredCashKauf = lebenshaltungKosten + wohnkostenKauf + bafoegJahr + zusatzEntnahmeJahr;
+                let etfFlowKauf = totalIncomeJahr - requiredCashKauf;
                 
                 if (yearOffset > 0) {
                     if (etfKaufen > 0) etfKaufen *= (1 + etfRendite);
@@ -614,18 +603,22 @@
                               wK, bK, sK_pos, sK_neg, wM, bM, sM_pos, sM_neg,
                               etfKW, immoKW, rsW, etfMW) {
             
-            let maxCash = Math.max(
-                ...wK.map((v, i) => v + bK[i] + sK_pos[i]),
-                ...wM.map((v, i) => v + bM[i] + sM_pos[i])
-            ) * 1.05;
-            let minCash = Math.min(...sK_neg, ...sM_neg) * 1.05;
-            if (minCash >= 0) minCash = 0;
+            // Dynamische Max/Min Berechnung für das Cashflow Chart
+            let maxCash = 0;
+            let minCash = 0;
+            for(let i = 0; i < wK.length; i++) {
+                let sumBuyPos = wK[i] + bK[i] + sK_pos[i];
+                let sumRentPos = wM[i] + bM[i] + sM_pos[i];
+                maxCash = Math.max(maxCash, sumBuyPos, sumRentPos);
+                minCash = Math.min(minCash, sK_neg[i], sM_neg[i]);
+            }
+            maxCash = maxCash * 1.1; // 10% Headroom
+            minCash = minCash * 1.1;
+            if (minCash === 0) minCash = 0;
             
-            let maxWealth = Math.max(
-                ...etfKW.map((v, i) => Math.max(0, v) + immoKW[i]),
-                ...etfMW.map(v => Math.max(0, v))
-            ) * 1.05;
-            let minWealth = Math.min(...rsW, ...etfKW, ...etfMW) * 1.05;
+            // Dynamische Max/Min Berechnung für das Wealth Chart (NICHT mehr gestapelt)
+            let maxWealth = Math.max(...etfKW, ...immoKW, ...rsW, ...etfMW) * 1.1;
+            let minWealth = Math.min(...etfKW, ...immoKW, ...rsW, ...etfMW) * 1.1;
             if(minWealth >= 0) minWealth = 0;
             
             const titleCb = (ctx) => {
@@ -636,7 +629,7 @@
             const absLabelCb = (c) => c.dataset.label + ': ' + currFmt.format(c.parsed.y);
             
             const cashOptions = {
-                responsive: true, maintainAspectRatio: false, animation: false,
+                responsive: true, maintainAspectRatio: false,
                 interaction: { mode: 'index', intersect: false },
                 scales: { 
                     x: { title: { display: false } },
@@ -649,11 +642,11 @@
             };
             
             const wealthOptions = {
-                responsive: true, maintainAspectRatio: false, animation: false,
+                responsive: true, maintainAspectRatio: false,
                 interaction: { mode: 'index', intersect: false },
                 scales: { 
                     x: { title: { display: false } },
-                    y: { stacked: true, max: maxWealth, min: minWealth, ticks: { callback: v => currFmt.format(v) } }
+                    y: { stacked: false, max: maxWealth, min: minWealth, ticks: { callback: v => currFmt.format(v) } }
                 },
                 plugins: { 
                     legend: { position: 'bottom', labels: { boxWidth: 12, padding: 10, font: {family: 'Inter'} } },
@@ -701,28 +694,28 @@
             
             if(cBuyCash) { 
                 cBuyCash.data.labels = labels; cBuyCash.data.datasets = dsBuyCash; 
-                cBuyCash.options.scales.y.max = maxCash; cBuyCash.options.scales.y.min = minCash; cBuyCash.update('none');
+                cBuyCash.options.scales.y.max = maxCash; cBuyCash.options.scales.y.min = minCash; cBuyCash.update();
             } else { 
                 cBuyCash = new Chart(document.getElementById('buyCashflowChart').getContext('2d'), { type: 'line', data: { labels: labels, datasets: dsBuyCash }, options: cashOptions });
             }
 
             if(cBuyWealth) { 
                 cBuyWealth.data.labels = labels; cBuyWealth.data.datasets = dsBuyWealth;
-                cBuyWealth.options.scales.y.max = maxWealth; cBuyWealth.options.scales.y.min = minWealth; cBuyWealth.update('none'); 
+                cBuyWealth.options.scales.y.max = maxWealth; cBuyWealth.options.scales.y.min = minWealth; cBuyWealth.update(); 
             } else { 
                 cBuyWealth = new Chart(document.getElementById('buyWealthChart').getContext('2d'), { type: 'line', data: { labels: labels, datasets: dsBuyWealth }, options: wealthOptions });
             }
 
             if(cRentCash) { 
                 cRentCash.data.labels = labels; cRentCash.data.datasets = dsRentCash;
-                cRentCash.options.scales.y.max = maxCash; cRentCash.options.scales.y.min = minCash; cRentCash.update('none'); 
+                cRentCash.options.scales.y.max = maxCash; cRentCash.options.scales.y.min = minCash; cRentCash.update(); 
             } else { 
                 cRentCash = new Chart(document.getElementById('rentCashflowChart').getContext('2d'), { type: 'line', data: { labels: labels, datasets: dsRentCash }, options: cashOptions });
             }
 
             if(cRentWealth) { 
                 cRentWealth.data.labels = labels; cRentWealth.data.datasets = dsRentWealth;
-                cRentWealth.options.scales.y.max = maxWealth; cRentWealth.options.scales.y.min = minWealth; cRentWealth.update('none'); 
+                cRentWealth.options.scales.y.max = maxWealth; cRentWealth.options.scales.y.min = minWealth; cRentWealth.update(); 
             } else { 
                 cRentWealth = new Chart(document.getElementById('rentWealthChart').getContext('2d'), { type: 'line', data: { labels: labels, datasets: dsRentWealth }, options: wealthOptions });
             }
