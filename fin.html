@@ -6,7 +6,6 @@
     <title>Dashboard: Finanzierung & Lebensplanung Leipzig</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
     <style>
         :root {
             --bg-color: #f1f5f9;
@@ -18,115 +17,27 @@
             --info-bg: #f8fafc;
             --info-border: #cbd5e1;
         }
-
         * { box-sizing: border-box; }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            padding: 20px;
-        }
-
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px; height: 100vh; display: flex; flex-direction: column; }
         header { margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end;}
         header h1 { margin: 0; font-size: 1.5rem; }
-        
-        .result-badge {
-            background: var(--primary);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-
-        .dashboard {
-            display: grid;
-            grid-template-columns: 400px 1fr;
-            gap: 20px;
-            align-items: start;
-        }
-
-        .controls-panel {
-            background: var(--panel-bg);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--border);
-        }
-
+        .result-badge { background: var(--primary); color: white; padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 1.1rem; }
+        .dashboard { display: grid; grid-template-columns: 400px 1fr; gap: 20px; flex: 1; min-height: 0; }
+        .controls-panel { background: var(--panel-bg); border-radius: 12px; padding: 20px; overflow-y: auto; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid var(--border); }
         .control-section { margin-bottom: 25px; }
-        .control-section h3 {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-main);
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 8px;
-            margin-bottom: 15px;
-        }
-
+        .control-section h3 { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-main); border-bottom: 2px solid var(--border); padding-bottom: 8px; margin-bottom: 15px; }
         .control-group { margin-bottom: 15px; }
         .control-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .control-header label { font-size: 0.9rem; font-weight: 500; }
-        .control-header input[type="number"], select {
-            width: 100px;
-            padding: 4px 8px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            text-align: right;
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            color: var(--primary);
-        }
+        .control-header input[type="number"], select { width: 100px; padding: 4px 8px; border: 1px solid var(--border); border-radius: 6px; text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: var(--primary); }
         select { width: 100%; text-align: left; margin-bottom: 10px; padding: 8px; }
-
         input[type="range"] { width: 100%; accent-color: var(--primary); cursor: pointer; }
-
-        .charts-panel { display: flex; flex-direction: column; gap: 20px; }
-        
-        .info-box {
-            background: var(--info-bg);
-            border: 1px solid var(--info-border);
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            line-height: 1.5;
-            color: var(--text-muted);
-        }
-
-        .chart-card {
-            background: var(--panel-bg);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--border);
-        }
+        .charts-panel { display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
+        .info-box { background: var(--info-bg); border: 1px solid var(--info-border); padding: 15px; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; color: var(--text-muted); }
+        .chart-card { background: var(--panel-bg); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid var(--border); flex: 1; min-height: 350px; display: flex; flex-direction: column; }
         .chart-card h2 { font-size: 1.1rem; margin: 0 0 15px 0; }
-        
-        /* FESTE HÖHE GARANTIERT DIE SICHTBARKEIT DES CHARTS */
-        .canvas-wrapper { 
-            position: relative; 
-            height: 400px; 
-            width: 100%; 
-        }
-
-        /* Container für Fehlermeldungen */
-        #error-msg {
-            display: none;
-            background: #fef2f2;
-            color: #dc2626;
-            border: 1px solid #fecaca;
-            padding: 15px;
-            border-radius: 8px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-
-        @media (max-width: 1024px) {
-            .dashboard { grid-template-columns: 1fr; }
-        }
+        .canvas-wrapper { position: relative; flex: 1; width: 100%; }
+        @media (max-width: 1024px) { .dashboard { grid-template-columns: 1fr; } body { height: auto; display: block; } .charts-panel { overflow: visible; } }
     </style>
 </head>
 <body>
@@ -137,8 +48,6 @@
         </div>
         <div class="result-badge" id="darlehenDisplay">Darlehen: 0 €</div>
     </header>
-    
-    <div id="error-msg">Achtung: Die Diagramm-Bibliothek konnte nicht geladen werden. Bitte überprüfe, ob ein Adblocker das Laden von cdn.jsdelivr.net verhindert.</div>
 
     <div class="dashboard">
         <div class="controls-panel">
@@ -243,7 +152,7 @@
             </div>
 
             <div class="chart-card">
-                <h2>1. Monatliche Wohnkosten & Liquiditätsabfluss</h2>
+                <h2>1. Monatliche Wohnkosten & Liquiditätsabfluss (ab 2026)</h2>
                 <div class="canvas-wrapper"><canvas id="cashflowChart"></canvas></div>
             </div>
 
@@ -256,7 +165,6 @@
     </div>
 
     <script>
-        // Check if Chart JS loaded properly
         if (typeof Chart === 'undefined') {
             document.getElementById('darlehenDisplay').style.display = 'none';
             document.getElementById('darlehenDisplay').parentElement.innerHTML += '<div style="background:#ef4444; color:white; padding: 10px; border-radius: 8px;">Fehler: Chart.js konnte nicht geladen werden. Bitte Internetverbindung prüfen.</div>';
@@ -265,16 +173,20 @@
         let wealthChartInstance = null;
         let cashflowChartInstance = null;
         
+        // Globale Arrays für die Tooltips
         let arrImmoKauf = [];
         let arrEtfKauf = [];
         let arrRestschuld = [];
+        let arrSparMieteMtl = [];
+        let arrSparKaufMtl = [];
 
         const KAUFNEBENKOSTEN_FAKTOR = 0.075;
         const JAHRE_BIS_BAFOEG = 15;
         const BAFOEG_DAUER = 5;
         const JAHRE_BIS_RENTE = 25;
+        const START_JAHR = 2026;
+        const START_ALTER = 40;
 
-        // Regler und Nummerneingabe synchronisieren
         const syncPairs = ['zins', 'tilgung', 'sondertilgung', 'hausgeld', 'miete', 'sparplan', 'etfRendite', 'immoZuwachs', 'inflation', 'bafoeg', 'wunschNetto', 'rente1', 'rente2', 'zusatzEntnahme'];
         
         syncPairs.forEach(id => {
@@ -297,8 +209,9 @@
             arrImmoKauf = [];
             arrEtfKauf = [];
             arrRestschuld = [];
+            arrSparMieteMtl = [];
+            arrSparKaufMtl = [];
 
-            // Parameter sicher auslesen (mit Fallback auf 0 falls Feld leer ist)
             const szenario = parseInt(document.getElementById('szenario').value) || 2;
             const kaufpreis = parseFloat(document.getElementById('kaufpreis').value) || 0;
             const sanHaus = parseFloat(document.getElementById('sanHaus').value) || 0;
@@ -322,7 +235,6 @@
             const rente2 = parseFloat(document.getElementById('rente2Num').value) || 0;
             const zusatzEntnahme = parseFloat(document.getElementById('zusatzEntnahmeNum').value) || 0;
 
-            // Logik
             const nebenkosten = kaufpreis * KAUFNEBENKOSTEN_FAKTOR;
             let projektkostenBank = kaufpreis + sanHaus;
             let barreserve = 0;
@@ -345,7 +257,6 @@
 
             let rentenlueckeHeute = Math.max(0, wunschNetto - rente1 - rente2);
             const annuitaetP_a = kreditStart * (zins + tilgung);
-            
             const haushaltsBudgetMtl = mieteHeute + sparplan;
             
             let labels = [];
@@ -357,7 +268,8 @@
             let restschuld = kreditStart;
 
             for (let year = 0; year <= 45; year++) {
-                labels.push(40 + year);
+                // X-Achse: Kalenderjahr
+                labels.push(START_JAHR + year);
                 
                 let infFaktor = Math.pow(1 + inflation, year);
                 let mieteJahr = mieteHeute * infFaktor * 12;
@@ -368,6 +280,8 @@
                 let istInRente = year >= JAHRE_BIS_RENTE;
 
                 let kreditCashflow = 0;
+                let sparrateMietenAktuell = 0;
+                let sparrateKaufenAktuell = 0;
 
                 if (year > 0) {
                     let zinsKosten = restschuld * zins;
@@ -387,8 +301,8 @@
                     else { etfMieten = etfMieten * (1 + zins); } 
                     
                     if (!istInRente) {
-                        let sparrateMieten = (haushaltsBudgetMtl * 12) - mieteJahr;
-                        etfMieten += sparrateMieten - entnahmeSohn;
+                        sparrateMietenAktuell = (haushaltsBudgetMtl * 12) - mieteJahr;
+                        etfMieten += sparrateMietenAktuell - entnahmeSohn;
                     } else {
                         etfMieten -= mieteJahr + entnahmeRente + entnahmeSohn;
                     }
@@ -399,15 +313,21 @@
                     
                     if (!istInRente) {
                         let wohnkostenKauf = kreditCashflow + hausgeldJahr;
-                        let sparrateKaufen = (haushaltsBudgetMtl * 12) - wohnkostenKauf;
-                        if (sparrateKaufen > sparplan * 12) { sparrateKaufen = sparplan * 12; }
-                        etfKaufen += sparrateKaufen - entnahmeSohn;
+                        sparrateKaufenAktuell = (haushaltsBudgetMtl * 12) - wohnkostenKauf;
+                        if (sparrateKaufenAktuell > sparplan * 12) { sparrateKaufenAktuell = sparplan * 12; }
+                        etfKaufen += sparrateKaufenAktuell - entnahmeSohn;
                     } else {
                         etfKaufen -= (kreditCashflow + hausgeldJahr) + entnahmeRente + entnahmeSohn;
                     }
                 } else {
                     kreditCashflow = (restschuld > 0) ? annuitaetP_a + sondertilgung : 0;
+                    sparrateMietenAktuell = sparplan * 12;
+                    sparrateKaufenAktuell = sparplan * 12;
                 }
+
+                // Werte für die Tooltips speichern (Monats-Werte)
+                arrSparMieteMtl.push(sparrateMietenAktuell / 12);
+                arrSparKaufMtl.push(sparrateKaufenAktuell / 12);
 
                 arrImmoKauf.push(immoWert);
                 arrEtfKauf.push(etfKaufen);
@@ -432,10 +352,11 @@
             if (wealthChartInstance) wealthChartInstance.destroy();
             if (cashflowChartInstance) cashflowChartInstance.destroy();
 
-            const commonOptions = {
-                responsive: true, maintainAspectRatio: false,
-                interaction: { mode: 'index', intersect: false },
-                scales: { y: { ticks: { callback: v => currFmt.format(v) } }, x: { title: { display: true, text: 'Lebensalter (Jahre)' } } }
+            // Titel für Tooltip generieren (Jahr + Alter)
+            const titleCallback = function(context) {
+                let year = context[0].label;
+                let age = parseInt(year) - START_JAHR + START_ALTER;
+                return `Jahr ${year} (Alter: ${age} Jahre)`;
             };
 
             cashflowChartInstance = new Chart(ctx2, {
@@ -443,13 +364,39 @@
                 data: {
                     labels: labels,
                     datasets: [
-                        { label: 'Wohnkosten Mieten (mtl.)', data: cm, borderColor: '#ef4444', borderWidth: 2, tension: 0.3 },
-                        { label: 'Wohnkosten Kaufen (mtl.)', data: ck, borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', borderWidth: 3, fill: true, stepped: true }
+                        { label: 'Wohnkosten Mieten', data: cm, borderColor: '#ef4444', borderWidth: 2, tension: 0.3 },
+                        { label: 'Wohnkosten Kaufen', data: ck, borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', borderWidth: 3, fill: true, stepped: true }
                     ]
                 },
                 options: {
-                    ...commonOptions,
-                    plugins: { tooltip: { callbacks: { label: c => c.dataset.label + ': ' + currFmt.format(c.parsed.raw) } } }
+                    responsive: true, maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: { y: { ticks: { callback: v => currFmt.format(v) } }, x: { title: { display: true, text: 'Kalenderjahr' } } },
+                    plugins: { 
+                        tooltip: { 
+                            title: titleCallback,
+                            callbacks: { 
+                                label: function(context) {
+                                    let idx = context.dataIndex;
+                                    let val = context.parsed.y;
+                                    let label = context.dataset.label;
+                                    
+                                    if (label.includes('Mieten')) {
+                                        return [
+                                            `${label}: ${currFmt.format(val)}`,
+                                            `   + ETF Sparrate: ${currFmt.format(arrSparMieteMtl[idx])}`
+                                        ];
+                                    } else if (label.includes('Kaufen')) {
+                                        return [
+                                            `${label}: ${currFmt.format(val)}`,
+                                            `   + ETF Sparrate: ${currFmt.format(arrSparKaufMtl[idx])}`
+                                        ];
+                                    }
+                                    return `${label}: ${currFmt.format(val)}`;
+                                } 
+                            } 
+                        } 
+                    }
                 }
             });
 
@@ -464,21 +411,24 @@
                     ]
                 },
                 options: {
-                    ...commonOptions,
+                    responsive: true, maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: { y: { ticks: { callback: v => currFmt.format(v) } }, x: { title: { display: true, text: 'Kalenderjahr' } } },
                     plugins: { 
                         tooltip: { 
+                            title: titleCallback,
                             callbacks: { 
                                 label: function(context) {
                                     let label = context.dataset.label || '';
                                     if (label === 'Gesamtvermögen Kaufen') {
                                         let idx = context.dataIndex;
                                         return [
-                                            label + ': ' + currFmt.format(context.raw),
-                                            '   ↳ Haus-Anteil: ' + currFmt.format(arrImmoKauf[idx]),
-                                            '   ↳ ETF-Depot: ' + currFmt.format(arrEtfKauf[idx])
+                                            `${label}: ${currFmt.format(context.parsed.y)}`,
+                                            `   ↳ Haus-Anteil: ${currFmt.format(arrImmoKauf[idx])}`,
+                                            `   ↳ ETF-Depot: ${currFmt.format(arrEtfKauf[idx])}`
                                         ];
                                     }
-                                    return label + ': ' + currFmt.format(context.raw);
+                                    return `${label}: ${currFmt.format(context.parsed.y)}`;
                                 } 
                             } 
                         } 
