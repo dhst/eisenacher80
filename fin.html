@@ -23,7 +23,7 @@
         header h1 { margin: 0; font-size: 1.5rem; }
         .result-badge { background: var(--primary); color: white; padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 1.1rem; }
         
-        .dashboard { display: grid; grid-template-columns: 380px 1fr; gap: 20px; flex: 1; min-height: 0; }
+        .dashboard { display: grid; grid-template-columns: 400px 1fr; gap: 20px; flex: 1; min-height: 0; }
         .controls-panel { background: var(--panel-bg); border-radius: 12px; padding: 20px; overflow-y: auto; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid var(--border); }
         
         .control-section { margin-bottom: 25px; }
@@ -31,7 +31,7 @@
         .control-group { margin-bottom: 15px; }
         .control-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .control-header label { font-size: 0.85rem; font-weight: 500; }
-        .control-header input[type="number"], select { width: 90px; padding: 4px 8px; border: 1px solid var(--border); border-radius: 6px; text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: var(--primary); }
+        .control-header input[type="number"], select { width: 95px; padding: 4px 8px; border: 1px solid var(--border); border-radius: 6px; text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: var(--primary); }
         select { width: 100%; text-align: left; margin-bottom: 10px; padding: 8px; }
         input[type="range"] { width: 100%; accent-color: var(--primary); cursor: pointer; }
         input[type="checkbox"] { accent-color: var(--primary); width: 18px; height: 18px; cursor: pointer; }
@@ -41,7 +41,10 @@
         
         .chart-card { background: var(--panel-bg); border-radius: 12px; padding: 15px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid var(--border); display: flex; flex-direction: column; margin-bottom: 20px; }
         .chart-card h2 { font-size: 0.95rem; margin: 0 0 10px 0; color: var(--text-muted); text-align: center;}
-        .canvas-wrapper { position: relative; height: 260px; width: 100%; }
+        
+        /* Feste Höhen für die Charts (Vermeidet Flackern und verbessert Lesbarkeit) */
+        .cash-canvas { position: relative; height: 320px; width: 100%; }
+        .wealth-canvas { position: relative; height: 420px; width: 100%; }
 
         .flex-row { display: flex; gap: 10px; justify-content: space-between; margin-bottom: 15px; }
         .flex-row .control-group { flex: 1; margin-bottom: 0; }
@@ -86,35 +89,24 @@
             </div>
 
             <div class="control-section">
-                <h3>2. Familie & Lebensphasen</h3>
+                <h3>2. Familie & Rente</h3>
                 <div class="flex-row">
-                    <div class="control-group">
-                        <label>Alter Mann</label><input type="number" id="alterMannNum" value="40">
-                    </div>
-                    <div class="control-group">
-                        <label>Alter Frau</label><input type="number" id="alterFrauNum" value="39">
-                    </div>
+                    <div class="control-group"><label>Alter Mann</label><input type="number" id="alterMannNum" value="40"></div>
+                    <div class="control-group"><label>Alter Frau</label><input type="number" id="alterFrauNum" value="39"></div>
+                </div>
+                <div class="flex-row">
+                    <div class="control-group"><label>Rentenalter Mann</label><input type="number" id="renteMannAlterNum" value="67"></div>
+                    <div class="control-group"><label>Rentenalter Frau</label><input type="number" id="renteFrauAlterNum" value="67"></div>
+                </div>
+                <div class="flex-row">
+                    <div class="control-group"><label>Geburtsjahr Sohn</label><input type="number" id="sohnGeburtsjahrNum" value="2023"></div>
+                    <div class="control-group"><label>BAföG Dauer (Jahre)</label><input type="number" id="bafoegDauerNum" value="5"></div>
                 </div>
                 
-                <div class="flex-row">
-                    <div class="control-group">
-                        <label>Rentenalter Mann</label><input type="number" id="renteMannAlterNum" value="67">
-                    </div>
-                    <div class="control-group">
-                        <label>Rentenalter Frau</label><input type="number" id="renteFrauAlterNum" value="67">
-                    </div>
-                </div>
-
-                <div class="flex-row">
-                    <div class="control-group">
-                        <label>Geburtsjahr Sohn</label><input type="number" id="sohnGeburtsjahrNum" value="2023">
-                    </div>
-                    <div class="control-group">
-                        <label>BAföG Start (Alter)</label><input type="number" id="bafoegStartAlterNum" value="18">
-                    </div>
-                </div>
-                <div class="control-group"><div class="control-header"><label>BAföG Dauer (Jahre)</label><input type="number" id="bafoegDauerNum" value="5"></div></div>
                 <div class="control-group"><div class="control-header"><label>BAföG-Ersatz mtl. (€)</label><input type="number" id="bafoegNum" value="800" step="50"></div><input type="range" id="bafoegSlide" min="0" max="2000" step="50" value="800"></div>
+                <div class="control-group"><div class="control-header"><label>Wunsch-Haushalt netto (€)</label><input type="number" id="wunschNettoNum" value="4500" step="100"></div><input type="range" id="wunschNettoSlide" min="2000" max="10000" step="100" value="4500"></div>
+                <div class="control-group"><div class="control-header"><label>Gesetzl. Rente Mann (€)</label><input type="number" id="rente1Num" value="2000" step="100"></div><input type="range" id="rente1Slide" min="0" max="4000" step="100" value="2000"></div>
+                <div class="control-group"><div class="control-header"><label>Gesetzl. Rente Frau (€)</label><input type="number" id="rente2Num" value="1500" step="100"></div><input type="range" id="rente2Slide" min="0" max="4000" step="100" value="1500"></div>
             </div>
 
             <div class="control-section">
@@ -127,7 +119,7 @@
             </div>
 
             <div class="control-section">
-                <h3>4. Mieten & Sparen</h3>
+                <h3>4. Budget & Inflation</h3>
                 <div class="control-group">
                     <div class="control-header">
                         <label style="color:var(--text-main);">Inflation einrechnen</label>
@@ -136,47 +128,36 @@
                 </div>
                 <div class="control-group"><div class="control-header"><label>Inflationsrate p.a. (%)</label><input type="number" id="inflationNum" value="2.0" step="0.1"></div><input type="range" id="inflationSlide" min="0" max="6" step="0.1" value="2.0"></div>
                 
+                <div class="control-group"><div class="control-header"><label>Gesamtbudget (Wohnen+Sparen)</label><input type="number" id="budgetNum" value="3200" step="100"></div><input type="range" id="budgetSlide" min="1000" max="8000" step="100" value="3200"></div>
                 <div class="control-group"><div class="control-header"><label>Kaltmiete (Vergleich, €/M)</label><input type="number" id="mieteNum" value="1200" step="50"></div><input type="range" id="mieteSlide" min="500" max="3000" step="50" value="1200"></div>
-                <div class="control-group"><div class="control-header"><label>Max. Sparplan (mtl. €)</label><input type="number" id="sparplanNum" value="2000" step="100"></div><input type="range" id="sparplanSlide" min="0" max="5000" step="100" value="2000"></div>
                 <div class="control-group"><div class="control-header"><label>ETF Rendite p.a. (%)</label><input type="number" id="etfRenditeNum" value="5.0" step="0.1"></div><input type="range" id="etfRenditeSlide" min="0" max="10" step="0.1" value="5.0"></div>
             </div>
 
-            <div class="control-section">
-                <h3>5. Einkommen in der Rente</h3>
-                <div class="control-group"><div class="control-header"><label>Wunsch-Haushalt netto (€)</label><input type="number" id="wunschNettoNum" value="4500" step="100"></div><input type="range" id="wunschNettoSlide" min="2000" max="10000" step="100" value="4500"></div>
-                <div class="control-group"><div class="control-header"><label>Gesetzl. Rente Mann (€)</label><input type="number" id="rente1Num" value="2000" step="100"></div><input type="range" id="rente1Slide" min="0" max="4000" step="100" value="2000"></div>
-                <div class="control-group"><div class="control-header"><label>Gesetzl. Rente Frau (€)</label><input type="number" id="rente2Num" value="1500" step="100"></div><input type="range" id="rente2Slide" min="0" max="4000" step="100" value="1500"></div>
-                <div class="control-group"><div class="control-header"><label>Zusatzentnahme Alter (€)</label><input type="number" id="zusatzEntnahmeNum" value="0" step="100"></div><input type="range" id="zusatzEntnahmeSlide" min="0" max="3000" step="100" value="0"></div>
-            </div>
         </div>
 
         <div class="charts-panel">
             
             <div class="chart-col">
                 <div class="col-header">Szenario: Kaufen</div>
-                
                 <div class="chart-card">
-                    <h2>1.1 Mtl. Cashflow (Wohnen + Sparen + BAföG)</h2>
-                    <div class="canvas-wrapper"><canvas id="buyCashflowChart"></canvas></div>
+                    <h2>1.1 Mtl. Cashflow (Einnahmen oben / Ausgaben unten)</h2>
+                    <div class="cash-canvas"><canvas id="buyCashflowChart"></canvas></div>
                 </div>
-
                 <div class="chart-card">
                     <h2>1.2 Vermögenswerte & Restschuld</h2>
-                    <div class="canvas-wrapper"><canvas id="buyWealthChart"></canvas></div>
+                    <div class="wealth-canvas"><canvas id="buyWealthChart"></canvas></div>
                 </div>
             </div>
 
             <div class="chart-col">
                 <div class="col-header">Szenario: Mieten</div>
-                
                 <div class="chart-card">
-                    <h2>2.1 Mtl. Cashflow (Wohnen + Sparen + BAföG)</h2>
-                    <div class="canvas-wrapper"><canvas id="rentCashflowChart"></canvas></div>
+                    <h2>2.1 Mtl. Cashflow (Einnahmen oben / Ausgaben unten)</h2>
+                    <div class="cash-canvas"><canvas id="rentCashflowChart"></canvas></div>
                 </div>
-
                 <div class="chart-card">
                     <h2>2.2 Vermögenswerte (ETF-Depot)</h2>
-                    <div class="canvas-wrapper"><canvas id="rentWealthChart"></canvas></div>
+                    <div class="wealth-canvas"><canvas id="rentWealthChart"></canvas></div>
                 </div>
             </div>
 
@@ -189,8 +170,7 @@
         let cRentCash = null;
         let cRentWealth = null;
 
-        // Binding Logic
-        const syncPairs = ['zins', 'tilgung', 'sondertilgung', 'hausgeld', 'miete', 'sparplan', 'etfRendite', 'immoZuwachs', 'inflation', 'bafoeg', 'wunschNetto', 'rente1', 'rente2', 'zusatzEntnahme'];
+        const syncPairs = ['zins', 'tilgung', 'sondertilgung', 'hausgeld', 'miete', 'budget', 'etfRendite', 'immoZuwachs', 'inflation', 'bafoeg', 'wunschNetto', 'rente1', 'rente2'];
         
         syncPairs.forEach(id => {
             const num = document.getElementById(id + 'Num');
@@ -201,7 +181,7 @@
             }
         });
 
-        const singleInputs = ['kaufpreis', 'sanHaus', 'sanWohnung', 'ek', 'szenario', 'startJahrNum', 'alterMannNum', 'alterFrauNum', 'renteMannAlterNum', 'renteFrauAlterNum', 'sohnGeburtsjahrNum', 'bafoegStartAlterNum', 'bafoegDauerNum', 'nebenkostenNum'];
+        const singleInputs = ['kaufpreis', 'sanHaus', 'sanWohnung', 'ek', 'szenario', 'startJahrNum', 'alterMannNum', 'alterFrauNum', 'renteMannAlterNum', 'renteFrauAlterNum', 'sohnGeburtsjahrNum', 'bafoegDauerNum', 'nebenkostenNum'];
         singleInputs.forEach(id => {
             let el = document.getElementById(id);
             if(el) el.addEventListener('input', calculateAndDraw);
@@ -210,7 +190,7 @@
         function calculateAndDraw() {
             if (typeof Chart === 'undefined') return;
 
-            // 1. Setup Parameter
+            // 1. Parameter auslesen
             const startJahr = parseInt(document.getElementById('startJahrNum').value) || 2026;
             const alterMannStart = parseInt(document.getElementById('alterMannNum').value) || 40;
             const alterFrauStart = parseInt(document.getElementById('alterFrauNum').value) || 39;
@@ -218,7 +198,6 @@
             const renteFrauAlter = parseInt(document.getElementById('renteFrauAlterNum').value) || 67;
             
             const sohnGeburtsjahr = parseInt(document.getElementById('sohnGeburtsjahrNum').value) || 2023;
-            const bafoegStartAlter = parseInt(document.getElementById('bafoegStartAlterNum').value) || 18;
             const bafoegDauer = parseInt(document.getElementById('bafoegDauerNum').value) || 5;
             
             const nebenkostenFaktor = (parseFloat(document.getElementById('nebenkostenNum').value) || 0) / 100;
@@ -234,18 +213,17 @@
             
             const hausgeldHeute = parseFloat(document.getElementById('hausgeldNum').value) || 0;
             const mieteHeute = parseFloat(document.getElementById('mieteNum').value) || 0;
-            const sparplan = parseFloat(document.getElementById('sparplanNum').value) || 0;
+            const budgetHeute = parseFloat(document.getElementById('budgetNum').value) || 0;
+            
             const etfRendite = (parseFloat(document.getElementById('etfRenditeNum').value) || 0) / 100;
             const immoZuwachs = (parseFloat(document.getElementById('immoZuwachsNum').value) || 0) / 100;
-            
             const useInflation = document.getElementById('useInflation').checked;
-            const inflation = useInflation ? (parseFloat(document.getElementById('inflationNum').value) || 0) / 100 : 0;
+            const inflation = useInflation ? ((parseFloat(document.getElementById('inflationNum').value) || 0) / 100) : 0;
             
             const bafoegBetrag = parseFloat(document.getElementById('bafoegNum').value) || 0;
             const wunschNetto = parseFloat(document.getElementById('wunschNettoNum').value) || 0;
             const rente1 = parseFloat(document.getElementById('rente1Num').value) || 0;
             const rente2 = parseFloat(document.getElementById('rente2Num').value) || 0;
-            const zusatzEntnahme = parseFloat(document.getElementById('zusatzEntnahmeNum').value) || 0;
 
             // 2. Darlehen & Kapital
             const nebenkosten = kaufpreis * nebenkostenFaktor;
@@ -267,19 +245,20 @@
 
             const annuitaetP_a = kreditStart * (zins + tilgung);
             
-            // Arrays für Charts
+            // Arrays initialisieren
             let labels = [];
             
-            let aWohnKauf = [];
-            let aSparKauf = [];
-            let aStudium = []; 
-            let aEtfKauf = [];
-            let aImmoKauf = [];
-            let aRestschuld = [];
+            // Cashflow Einnahmen (Positiv)
+            let aGehaltKauf = [], aRenteMKauf = [], aRenteFKauf = [], aEtfEntnahmeKauf = [];
+            let aGehaltMiete = [], aRenteMMiete = [], aRenteFMiete = [], aEtfEntnahmeMiete = [];
+            
+            // Cashflow Ausgaben (Negativ)
+            let aWohnKauf = [], aSparKauf = [], aBafKauf = [], aKonsumKauf = [];
+            let aWohnMiete = [], aSparMiete = [], aBafMiete = [], aKonsumMiete = [];
 
-            let aWohnMiete = [];
-            let aSparMiete = [];
-            let aEtfMiete = [];
+            // Vermögen
+            let aEtfKaufWealth = [], aImmoKaufWealth = [], aRestschuld = [];
+            let aEtfMieteWealth = [];
 
             let restschuld = kreditStart;
 
@@ -294,130 +273,156 @@
                 let infFaktor = Math.pow(1 + inflation, yearOffset);
                 let mieteJahr = mieteHeute * infFaktor * 12;
                 let hausgeldJahr = hausgeldHeute * infFaktor * 12;
+                let budgetJahr = budgetHeute * infFaktor * 12;
+                let konsumJahr = wunschNetto * infFaktor * 12;
                 
-                let isMannInRente = alterMann >= renteMannAlter;
-                let isFrauInRente = alterFrau >= renteFrauAlter;
+                let isRenteM = alterMann >= renteMannAlter;
+                let isRenteF = alterFrau >= renteFrauAlter;
+                let anteilArbeit = (!isRenteM ? 0.5 : 0) + (!isRenteF ? 0.5 : 0);
                 
-                // Anteil der arbeitenden Partner (für den Sparplan)
-                let anteilArbeitend = (!isMannInRente ? 0.5 : 0) + (!isFrauInRente ? 0.5 : 0);
-                
-                // Rentenlücke: Berechnet sich dynamisch anhand derjenigen, die in Rente sind
-                let rentenlueckeHeute = 0;
-                if (anteilArbeitend < 1.0) {
-                    let ersatzEinkommen = (isMannInRente ? rente1 : wunschNetto/2) + (isFrauInRente ? rente2 : wunschNetto/2);
-                    rentenlueckeHeute = Math.max(0, wunschNetto - ersatzEinkommen);
-                }
+                let renteM_Jahr = isRenteM ? (rente1 * infFaktor * 12) : 0;
+                let renteF_Jahr = isRenteF ? (rente2 * infFaktor * 12) : 0;
+                let gesetzlicheRentenGesamt = renteM_Jahr + renteF_Jahr;
 
-                let entnahmeSohn = (alterSohn >= bafoegStartAlter && alterSohn < bafoegStartAlter + bafoegDauer) ? (bafoegBetrag * infFaktor * 12) : 0;
-                let entnahmeRente = (anteilArbeitend < 1.0) ? ((rentenlueckeHeute + (anteilArbeitend === 0 ? zusatzEntnahme : 0)) * infFaktor * 12) : 0;
+                let entnahmeSohnJahr = (alterSohn >= 18 && alterSohn < 18 + bafoegDauer) ? (bafoegBetrag * infFaktor * 12) : 0;
+                let konsumBedarfJahr = (1 - anteilArbeit) * konsumJahr; // Wächst mit Renteneintritt
                 
-                // Das Haushaltsbudget sinkt, wenn einer in Rente geht (Sparplan wird anteilig reduziert)
-                let aktiverSparplan = (sparplan * 12) * anteilArbeitend;
-                let haushaltsBudgetJahr = mieteJahr + aktiverSparplan;
-
                 let kreditCashflow = 0;
-                let sparrateMietenAktuell = 0;
-                let sparrateKaufenAktuell = 0;
 
                 if (yearOffset > 0) {
-                    // Kreditberechnung
                     let zinsKosten = restschuld * zins;
                     let tilgungsLeistung = annuitaetP_a - zinsKosten;
                     
                     if (restschuld > 0) {
                         let gesamtTilgung = tilgungsLeistung + sondertilgung;
-                        if (gesamtTilgung > restschuld) { gesamtTilgung = restschuld; }
+                        if (gesamtTilgung > restschuld) gesamtTilgung = restschuld;
                         restschuld -= gesamtTilgung;
                         kreditCashflow = zinsKosten + gesamtTilgung;
                     }
-
                     immoWert = immoWert * (1 + immoZuwachs);
-
-                    // --- ETF Mieten ---
-                    if (etfMieten > 0) { etfMieten = etfMieten * (1 + etfRendite); } 
-                    else { etfMieten = etfMieten * (1 + zins); } 
-                    
-                    // Aus dem vorhandenen Budget Miete zahlen. Rest ist die "reine" Sparrate
-                    sparrateMietenAktuell = haushaltsBudgetJahr - mieteJahr;
-                    // BAföG reduziert die Sparrate (wird direkt abgezogen)
-                    etfMieten += sparrateMietenAktuell - entnahmeSohn - entnahmeRente;
-
-                    // --- ETF Kaufen ---
-                    if (etfKaufen > 0) { etfKaufen = etfKaufen * (1 + etfRendite); } 
-                    else { etfKaufen = etfKaufen * (1 + zins); } 
-                    
-                    let wohnkostenKauf = kreditCashflow + hausgeldJahr;
-                    sparrateKaufenAktuell = haushaltsBudgetJahr - wohnkostenKauf;
-                    
-                    // Capping auf die maximale Sparrate des Jahres (damit nicht fälschlich Miete gespart wird)
-                    if (sparrateKaufenAktuell > aktiverSparplan) { sparrateKaufenAktuell = aktiverSparplan; }
-                    
-                    etfKaufen += sparrateKaufenAktuell - entnahmeSohn - entnahmeRente;
-
                 } else {
                     kreditCashflow = (restschuld > 0) ? annuitaetP_a + sondertilgung : 0;
-                    sparrateMietenAktuell = aktiverSparplan;
-                    sparrateKaufenAktuell = aktiverSparplan;
                 }
 
-                // Push Cashflow (Werte pro Monat im Chart)
-                aWohnKauf.push(Math.round((kreditCashflow + hausgeldJahr) / 12));
-                // Für das Gestapelte Chart zeigen wir nur den positiven "Zufluss" an
-                aSparKauf.push(Math.max(0, Math.round((sparrateKaufenAktuell - entnahmeSohn) / 12)));
+                // --- LOGIK KAUFEN ---
+                let kostenKauf = kreditCashflow + hausgeldJahr;
+                let ausgabenKauf = kostenKauf + entnahmeSohnJahr + konsumBedarfJahr;
+                let einnahmenKauf = (budgetJahr * anteilArbeit) + gesetzlicheRentenGesamt;
                 
-                aWohnMiete.push(Math.round(mieteJahr / 12));
-                aSparMiete.push(Math.max(0, Math.round((sparrateMietenAktuell - entnahmeSohn) / 12)));
-                
-                aStudium.push(Math.round(entnahmeSohn / 12));
+                let sparKauf = 0;
+                let entnahmeKauf = 0;
 
-                // Push Wealth
-                aEtfKauf.push(Math.round(etfKaufen));
-                aImmoKauf.push(Math.round(immoWert));
+                if (einnahmenKauf >= ausgabenKauf) {
+                    sparKauf = einnahmenKauf - ausgabenKauf;
+                } else {
+                    entnahmeKauf = ausgabenKauf - einnahmenKauf;
+                }
+
+                if (yearOffset > 0) {
+                    etfKaufen = etfKaufen * (1 + etfRendite); 
+                    etfKaufen += sparKauf - entnahmeKauf;
+                }
+
+                // --- LOGIK MIETEN ---
+                let ausgabenMiete = mieteJahr + entnahmeSohnJahr + konsumBedarfJahr;
+                let einnahmenMiete = (budgetJahr * anteilArbeit) + gesetzlicheRentenGesamt;
+                
+                let sparMiete = 0;
+                let entnahmeMiete = 0;
+
+                if (einnahmenMiete >= ausgabenMiete) {
+                    sparMiete = einnahmenMiete - ausgabenMiete;
+                } else {
+                    entnahmeMiete = ausgabenMiete - einnahmenMiete;
+                }
+
+                if (yearOffset > 0) {
+                    etfMieten = etfMieten * (1 + etfRendite); 
+                    etfMieten += sparMiete - entnahmeMiete;
+                }
+
+                // --- PUSH CASHFLOW DATA (in Monatsbeträgen) ---
+                // Einnahmen (+)
+                aGehaltKauf.push(Math.round((budgetJahr * anteilArbeit) / 12));
+                aRenteMKauf.push(Math.round(renteM_Jahr / 12));
+                aRenteFKauf.push(Math.round(renteF_Jahr / 12));
+                aEtfEntnahmeKauf.push(Math.round(entnahmeKauf / 12));
+
+                aGehaltMiete.push(Math.round((budgetJahr * anteilArbeit) / 12));
+                aRenteMMiete.push(Math.round(renteM_Jahr / 12));
+                aRenteFMiete.push(Math.round(renteF_Jahr / 12));
+                aEtfEntnahmeMiete.push(Math.round(entnahmeMiete / 12));
+
+                // Ausgaben (-)
+                aWohnKauf.push(Math.round(-kostenKauf / 12));
+                aSparKauf.push(Math.round(-sparKauf / 12));
+                aBafKauf.push(Math.round(-entnahmeSohnJahr / 12));
+                aKonsumKauf.push(Math.round(-konsumBedarfJahr / 12));
+
+                aWohnMiete.push(Math.round(-mieteJahr / 12));
+                aSparMiete.push(Math.round(-sparMiete / 12));
+                aBafMiete.push(Math.round(-entnahmeSohnJahr / 12));
+                aKonsumMiete.push(Math.round(-konsumBedarfJahr / 12));
+
+                // --- PUSH WEALTH DATA ---
+                aEtfKaufWealth.push(Math.round(etfKaufen));
+                aImmoKaufWealth.push(Math.round(immoWert));
                 aRestschuld.push(Math.round(-restschuld));
 
-                aEtfMiete.push(Math.round(etfMieten));
+                aEtfMieteWealth.push(Math.round(etfMieten));
             }
 
             renderCharts(labels, startJahr, alterMannStart, alterFrauStart,
-                         aWohnKauf, aSparKauf, aStudium, aEtfKauf, aImmoKauf, aRestschuld,
-                         aWohnMiete, aSparMiete, aEtfMiete);
+                         aGehaltKauf, aRenteMKauf, aRenteFKauf, aEtfEntnahmeKauf, aWohnKauf, aSparKauf, aBafKauf, aKonsumKauf,
+                         aGehaltMiete, aRenteMMiete, aRenteFMiete, aEtfEntnahmeMiete, aWohnMiete, aSparMiete, aBafMiete, aKonsumMiete,
+                         aEtfKaufWealth, aImmoKaufWealth, aRestschuld, aEtfMieteWealth);
         }
 
         const currFmt = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
 
-        function renderCharts(labels, startJahr, alterMann, alterFrau, wKauf, sKauf, studium, etfKauf, immoKauf, restschuld, wMiete, sMiete, etfMiete) {
+        function renderCharts(labels, startJahr, alterM, alterF,
+                              gK, rMK, rFK, eK, wK, sK, bK, cK,
+                              gM, rMM, rFM, eM, wM, sM, bM, cM,
+                              etfKW, immoKW, rsW, etfMW) {
             
-            // Sync Y-Axes Calculation
+            // Y-Axes Sync
+            // Max Cashflow (Positive sum)
             let maxCash = Math.max(
-                ...wKauf.map((v, i) => v + sKauf[i] + studium[i]),
-                ...wMiete.map((v, i) => v + sMiete[i] + studium[i])
+                ...gK.map((v, i) => v + rMK[i] + rFK[i] + eK[i]),
+                ...gM.map((v, i) => v + rMM[i] + rFM[i] + eM[i])
+            ) * 1.05;
+
+            // Min Cashflow (Negative sum)
+            let minCash = Math.min(
+                ...wK.map((v, i) => v + sK[i] + bK[i] + cK[i]),
+                ...wM.map((v, i) => v + sM[i] + bM[i] + cM[i])
             ) * 1.05;
 
             let maxWealth = Math.max(
-                ...etfKauf.map((v, i) => v + immoKauf[i]),
-                ...etfMiete
+                ...etfKW.map((v, i) => v + immoKW[i]),
+                ...etfMW
             ) * 1.05;
 
-            let minWealth = Math.min(...restschuld) * 1.05;
+            let minWealth = Math.min(...rsW) * 1.05;
             if(minWealth >= 0) minWealth = 0;
 
             const titleCb = (ctx) => {
                 let year = parseInt(ctx[0].label);
-                let aM = year - startJahr + alterMann;
-                let aF = year - startJahr + alterFrau;
-                return `Jahr ${year} (Alter M: ${aM} / F: ${aF})`;
+                return `Jahr ${year} (Alter M: ${year - startJahr + alterM} / F: ${year - startJahr + alterF})`;
             };
+
+            const absLabelCb = (c) => c.dataset.label + ': ' + currFmt.format(Math.abs(c.parsed.y));
 
             const cashOptions = {
                 responsive: true, maintainAspectRatio: false, animation: false,
                 interaction: { mode: 'index', intersect: false },
                 scales: { 
                     x: { title: { display: false } },
-                    y: { stacked: true, max: maxCash, min: 0, ticks: { callback: v => currFmt.format(v) } }
+                    y: { stacked: true, max: maxCash, min: minCash, ticks: { callback: v => currFmt.format(v) } }
                 },
                 plugins: { 
-                    legend: { position: 'bottom' },
-                    tooltip: { title: titleCb, callbacks: { label: c => c.dataset.label + ': ' + currFmt.format(c.parsed.y) } }
+                    legend: { position: 'bottom', labels: { boxWidth: 12 } },
+                    tooltip: { title: titleCb, callbacks: { label: absLabelCb } }
                 }
             };
 
@@ -429,96 +434,88 @@
                     y: { stacked: true, max: maxWealth, min: minWealth, ticks: { callback: v => currFmt.format(v) } }
                 },
                 plugins: { 
-                    legend: { position: 'bottom' },
-                    tooltip: { title: titleCb, callbacks: { label: c => c.dataset.label + ': ' + currFmt.format(Math.abs(c.parsed.y)) } }
+                    legend: { position: 'bottom', labels: { boxWidth: 12 } },
+                    tooltip: { title: titleCb, callbacks: { label: absLabelCb } }
                 }
             };
+
+            // DATASETS KAUFEN CASHFLOW
+            const dsBuyCash = [
+                { label: 'Gehalt / Einkommen', data: gK, backgroundColor: '#bae6fd', fill: true, tension: 0.1, stack: 'Income' },
+                { label: 'Rente Mann', data: rMK, backgroundColor: '#94a3b8', fill: true, tension: 0.1, stack: 'Income' },
+                { label: 'Rente Frau', data: rFK, backgroundColor: '#cbd5e1', fill: true, tension: 0.1, stack: 'Income' },
+                { label: 'ETF Entnahme', data: eK, backgroundColor: '#fb923c', fill: true, tension: 0.1, stack: 'Income' },
+                
+                { label: 'Wohnkosten (Kredit+Hausgeld)', data: wK, backgroundColor: '#3b82f6', fill: true, tension: 0.1, stack: 'Expense' },
+                { label: 'ETF Einzahlung', data: sK, backgroundColor: '#10b981', fill: true, tension: 0.1, stack: 'Expense' },
+                { label: 'BAföG-Unterstützung', data: bK, backgroundColor: '#facc15', fill: true, tension: 0.1, stack: 'Expense' },
+                { label: 'Lebenshaltung Rente', data: cK, backgroundColor: '#d946ef', fill: true, tension: 0.1, stack: 'Expense' }
+            ];
+
+            // DATASETS MIETEN CASHFLOW
+            const dsRentCash = [
+                { label: 'Gehalt / Einkommen', data: gM, backgroundColor: '#bae6fd', fill: true, tension: 0.1, stack: 'Income' },
+                { label: 'Rente Mann', data: rMM, backgroundColor: '#94a3b8', fill: true, tension: 0.1, stack: 'Income' },
+                { label: 'Rente Frau', data: rFM, backgroundColor: '#cbd5e1', fill: true, tension: 0.1, stack: 'Income' },
+                { label: 'ETF Entnahme', data: eM, backgroundColor: '#fb923c', fill: true, tension: 0.1, stack: 'Income' },
+                
+                { label: 'Kaltmiete', data: wM, backgroundColor: '#ef4444', fill: true, tension: 0.1, stack: 'Expense' },
+                { label: 'ETF Einzahlung', data: sM, backgroundColor: '#10b981', fill: true, tension: 0.1, stack: 'Expense' },
+                { label: 'BAföG-Unterstützung', data: bM, backgroundColor: '#facc15', fill: true, tension: 0.1, stack: 'Expense' },
+                { label: 'Lebenshaltung Rente', data: cM, backgroundColor: '#d946ef', fill: true, tension: 0.1, stack: 'Expense' }
+            ];
+
+            // DATASETS KAUFEN WEALTH
+            const dsBuyWealth = [
+                { label: 'Immobilienwert', data: immoKW, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.4)', fill: true, tension: 0.1 },
+                { label: 'ETF-Depot', data: etfKW, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.4)', fill: true, tension: 0.1 },
+                { label: 'Restschuld', data: rsW, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.4)', fill: true, tension: 0.1 }
+            ];
+
+            // DATASETS MIETEN WEALTH
+            const dsRentWealth = [
+                { label: 'ETF-Depot', data: etfMW, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.4)', fill: true, tension: 0.1 }
+            ];
 
             // UPDATE OR CREATE CHARTS
             if(cBuyCash) {
                 cBuyCash.data.labels = labels;
-                cBuyCash.data.datasets[0].data = wKauf;
-                cBuyCash.data.datasets[1].data = studium;
-                cBuyCash.data.datasets[2].data = sKauf;
+                cBuyCash.data.datasets = dsBuyCash;
                 cBuyCash.options.scales.y.max = maxCash;
-                cBuyCash.update();
+                cBuyCash.options.scales.y.min = minCash;
+                cBuyCash.update('none');
             } else {
-                cBuyCash = new Chart(document.getElementById('buyCashflowChart').getContext('2d'), {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            { label: 'Wohnkosten (Kredit+Hausgeld)', data: wKauf, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.7)', fill: true, tension: 0.1 },
-                            { label: 'BAföG-Unterstützung', data: studium, borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.7)', fill: true, tension: 0.1 },
-                            { label: 'ETF Einzahlung', data: sKauf, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.7)', fill: true, tension: 0.1 }
-                        ]
-                    },
-                    options: cashOptions
-                });
+                cBuyCash = new Chart(document.getElementById('buyCashflowChart').getContext('2d'), { type: 'line', data: { labels: labels, datasets: dsBuyCash }, options: cashOptions });
             }
 
             if(cBuyWealth) {
                 cBuyWealth.data.labels = labels;
-                cBuyWealth.data.datasets[0].data = immoKauf;
-                cBuyWealth.data.datasets[1].data = etfKauf;
-                cBuyWealth.data.datasets[2].data = restschuld;
+                cBuyWealth.data.datasets = dsBuyWealth;
                 cBuyWealth.options.scales.y.max = maxWealth;
                 cBuyWealth.options.scales.y.min = minWealth;
-                cBuyWealth.update();
+                cBuyWealth.update('none');
             } else {
-                cBuyWealth = new Chart(document.getElementById('buyWealthChart').getContext('2d'), {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            { label: 'Immobilienwert', data: immoKauf, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.4)', fill: true, tension: 0.1 },
-                            { label: 'ETF-Depot', data: etfKauf, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.4)', fill: true, tension: 0.1 },
-                            { label: 'Restschuld', data: restschuld, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.4)', fill: true, tension: 0.1 }
-                        ]
-                    },
-                    options: wealthOptions
-                });
+                cBuyWealth = new Chart(document.getElementById('buyWealthChart').getContext('2d'), { type: 'line', data: { labels: labels, datasets: dsBuyWealth }, options: wealthOptions });
             }
 
             if(cRentCash) {
                 cRentCash.data.labels = labels;
-                cRentCash.data.datasets[0].data = wMiete;
-                cRentCash.data.datasets[1].data = studium;
-                cRentCash.data.datasets[2].data = sMiete;
+                cRentCash.data.datasets = dsRentCash;
                 cRentCash.options.scales.y.max = maxCash;
-                cRentCash.update();
+                cRentCash.options.scales.y.min = minCash;
+                cRentCash.update('none');
             } else {
-                cRentCash = new Chart(document.getElementById('rentCashflowChart').getContext('2d'), {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            { label: 'Kaltmiete', data: wMiete, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.7)', fill: true, tension: 0.1 },
-                            { label: 'BAföG-Unterstützung', data: studium, borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.7)', fill: true, tension: 0.1 },
-                            { label: 'ETF Einzahlung', data: sMiete, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.7)', fill: true, tension: 0.1 }
-                        ]
-                    },
-                    options: cashOptions
-                });
+                cRentCash = new Chart(document.getElementById('rentCashflowChart').getContext('2d'), { type: 'line', data: { labels: labels, datasets: dsRentCash }, options: cashOptions });
             }
 
             if(cRentWealth) {
                 cRentWealth.data.labels = labels;
-                cRentWealth.data.datasets[0].data = etfMiete;
+                cRentWealth.data.datasets = dsRentWealth;
                 cRentWealth.options.scales.y.max = maxWealth;
                 cRentWealth.options.scales.y.min = minWealth;
-                cRentWealth.update();
+                cRentWealth.update('none');
             } else {
-                cRentWealth = new Chart(document.getElementById('rentWealthChart').getContext('2d'), {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            { label: 'ETF-Depot', data: etfMiete, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.4)', fill: true, tension: 0.1 }
-                        ]
-                    },
-                    options: wealthOptions
-                });
+                cRentWealth = new Chart(document.getElementById('rentWealthChart').getContext('2d'), { type: 'line', data: { labels: labels, datasets: dsRentWealth }, options: wealthOptions });
             }
         }
 
