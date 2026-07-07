@@ -90,12 +90,10 @@
                     <div class="control-group"><label>Alter Mann</label><input type="number" id="alterMannNum" value="40"></div>
                     <div class="control-group"><label>Alter Frau</label><input type="number" id="alterFrauNum" value="39"></div>
                 </div>
-                
                 <div class="flex-row">
                     <div class="control-group"><label>Rentenalter Mann</label><input type="number" id="renteMannAlterNum" value="67"></div>
                     <div class="control-group"><label>Rentenalter Frau</label><input type="number" id="renteFrauAlterNum" value="67"></div>
                 </div>
-
                 <div class="flex-row">
                     <div class="control-group"><label>Geburtsjahr Sohn</label><input type="number" id="sohnGeburtsjahrNum" value="2023"></div>
                     <div class="control-group"><label>BAföG Dauer (Jahre)</label><input type="number" id="bafoegDauerNum" value="5"></div>
@@ -175,9 +173,8 @@
 
         // Arrays für Tooltips
         let arrImmoKauf = [], arrEtfKauf = [], arrEtfMiete = [];
-
-        const syncPairs = ['zins', 'tilgung', 'sondertilgung', 'hausgeld', 'miete', 'sparplan', 'etfRendite', 'immoZuwachs', 'inflation', 'bafoeg', 'wunschNetto', 'rente1', 'rente2', 'zusatzEntnahme'];
         
+        const syncPairs = ['zins', 'tilgung', 'sondertilgung', 'hausgeld', 'miete', 'sparplan', 'etfRendite', 'immoZuwachs', 'inflation', 'bafoeg', 'wunschNetto', 'rente1', 'rente2', 'zusatzEntnahme'];
         syncPairs.forEach(id => {
             const num = document.getElementById(id + 'Num');
             const slide = document.getElementById(id + 'Slide');
@@ -186,7 +183,7 @@
                 slide.addEventListener('input', () => { num.value = slide.value; calculateAndDraw(); });
             }
         });
-
+        
         const singleInputs = ['kaufpreis', 'sanHaus', 'sanWohnung', 'ek', 'szenario', 'startJahrNum', 'alterMannNum', 'alterFrauNum', 'renteMannAlterNum', 'renteFrauAlterNum', 'sohnGeburtsjahrNum', 'bafoegDauerNum', 'nebenkostenNum', 'useInflation'];
         singleInputs.forEach(id => {
             let el = document.getElementById(id);
@@ -195,7 +192,6 @@
 
         function calculateAndDraw() {
             if (typeof Chart === 'undefined') return;
-
             arrImmoKauf = []; arrEtfKauf = []; arrEtfMiete = [];
 
             // 1. Setup Parameter
@@ -206,7 +202,7 @@
             const renteFrauAlter = parseInt(document.getElementById('renteFrauAlterNum').value) || 67;
             
             const sohnGeburtsjahr = parseInt(document.getElementById('sohnGeburtsjahrNum').value) || 2023;
-            const bafoegStartAlter = 18; 
+            const bafoegStartAlter = 18;
             const bafoegDauer = parseInt(document.getElementById('bafoegDauerNum').value) || 5;
             
             const nebenkostenFaktor = (parseFloat(document.getElementById('nebenkostenNum').value) || 0) / 100;
@@ -234,7 +230,7 @@
             const rente1 = parseFloat(document.getElementById('rente1Num').value) || 0;
             const rente2 = parseFloat(document.getElementById('rente2Num').value) || 0;
             const zusatzEntnahme = parseFloat(document.getElementById('zusatzEntnahmeNum').value) || 0;
-
+            
             // 2. Darlehen & Startkapital
             const nebenkosten = kaufpreis * nebenkostenFaktor;
             let projektkostenBank = kaufpreis + sanHaus;
@@ -248,11 +244,10 @@
             let ueberschussEK = Math.max(0, ekFuerBank - projektkostenBank);
 
             let etfMieten = eigenkapital; 
-            let etfKaufen = ueberschussEK; 
+            let etfKaufen = ueberschussEK;
             let immoWert = kaufpreis + sanHaus + sanWohnung;
 
             document.getElementById('darlehenDisplay').innerText = `Darlehen: ${new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(kreditStart)}`;
-
             const annuitaetP_a = kreditStart * (zins + tilgung);
             
             // Arrays initialisieren
@@ -261,7 +256,6 @@
             let aEtfEinzahlungKauf = [], aEtfEntnahmeKauf = [];
             let aEtfEinzahlungMiete = [], aEtfEntnahmeMiete = [];
             let aEtfKaufWealth = [], aImmoKaufWealth = [], aRestschuld = [], aEtfMieteWealth = [];
-
             let restschuld = kreditStart;
 
             for (let yearOffset = 0; yearOffset <= 45; yearOffset++) {
@@ -271,7 +265,6 @@
                 let alterMann = alterMannStart + yearOffset;
                 let alterFrau = alterFrauStart + yearOffset;
                 let alterSohn = currentYear - sohnGeburtsjahr;
-                
                 let infFaktor = Math.pow(1 + inflation, yearOffset);
                 let mieteJahr = mieteHeute * 12 * infFaktor;
                 let hausgeldJahr = hausgeldHeute * 12 * infFaktor;
@@ -296,7 +289,6 @@
                 let entnahmeZusatz = zusatzEntnahme * 12 * infFaktor * (1 - anteilArbeitend);
 
                 let kreditCashflow = 0;
-
                 if (yearOffset > 0) {
                     let zinsKosten = restschuld * zins;
                     let tilgungsLeistung = annuitaetP_a - zinsKosten;
@@ -312,26 +304,24 @@
                 }
 
                 let wohnkostenKauf = kreditCashflow + hausgeldJahr;
-
+                
                 // --- ETF FLOW MIETEN ---
                 let sparrateMiete = budgetJahr - mieteJahr;
                 let etfFlowMiete = sparrateMiete - entnahmeRente - entnahmeZusatz - bafoegJahr;
-
                 if (yearOffset > 0) {
-                    if (etfMieten > 0) etfMieten *= (1 + etfRendite); 
+                    if (etfMieten > 0) etfMieten *= (1 + etfRendite);
                     else etfMieten *= (1 + zins); // Zins für Schulden
-                    etfMieten += etfFlowMiete;
+                    etfMieten += etfFlowMiete * (1 + etfRendite / 2); // Angepasste unterjährige Verzinsung
                 }
 
                 // --- ETF FLOW KAUFEN ---
                 let sparrateKauf = budgetJahr - wohnkostenKauf;
                 if (sparrateKauf > maxSparplanJahr) { sparrateKauf = maxSparplanJahr; }
                 let etfFlowKauf = sparrateKauf - entnahmeRente - entnahmeZusatz - bafoegJahr;
-
                 if (yearOffset > 0) {
-                    if (etfKaufen > 0) etfKaufen *= (1 + etfRendite); 
+                    if (etfKaufen > 0) etfKaufen *= (1 + etfRendite);
                     else etfKaufen *= (1 + zins); 
-                    etfKaufen += etfFlowKauf;
+                    etfKaufen += etfFlowKauf * (1 + etfRendite / 2); // Angepasste unterjährige Verzinsung
                 }
 
                 // --- PUSH DATA ---
@@ -372,7 +362,7 @@
         }
 
         const currFmt = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
-
+        
         function renderCharts(labels, startJahr, alterM, alterF,
                               wK, bK, sK_pos, sK_neg, wM, bM, sM_pos, sM_neg,
                               etfKW, immoKW, rsW, etfMW) {
@@ -382,26 +372,24 @@
                 ...wK.map((v, i) => v + bK[i] + sK_pos[i]),
                 ...wM.map((v, i) => v + bM[i] + sM_pos[i])
             ) * 1.05;
-
             let minCash = Math.min(...sK_neg, ...sM_neg) * 1.05;
             if (minCash >= 0) minCash = 0;
-
+            
             // Y-Axes Sync (Wealth)
             let maxWealth = Math.max(
                 ...etfKW.map((v, i) => Math.max(0, v) + immoKW[i]),
                 ...etfMW.map(v => Math.max(0, v))
             ) * 1.05;
-
             let minWealth = Math.min(...rsW, ...etfKW, ...etfMW) * 1.05;
             if(minWealth >= 0) minWealth = 0;
-
+            
             const titleCb = (ctx) => {
                 let year = parseInt(ctx[0].label);
                 return `Jahr ${year} (Alter: ${year - startJahr + alterM} / ${year - startJahr + alterF})`;
             };
-
+            
             const absLabelCb = (c) => c.dataset.label + ': ' + currFmt.format(c.parsed.y);
-
+            
             const cashOptions = {
                 responsive: true, maintainAspectRatio: false, animation: false,
                 interaction: { mode: 'index', intersect: false },
@@ -414,7 +402,7 @@
                     tooltip: { title: titleCb, callbacks: { label: absLabelCb } }
                 }
             };
-
+            
             const wealthOptions = {
                 responsive: true, maintainAspectRatio: false, animation: false,
                 interaction: { mode: 'index', intersect: false },
@@ -427,23 +415,20 @@
                     tooltip: { 
                         title: titleCb, 
                         callbacks: { 
+                            afterTitle: function(context) {
+                                let idx = context[0].dataIndex;
+                                let isBuyChart = context[0].chart.data.datasets.some(ds => ds.label === 'Immobilienwert');
+                                let summe = isBuyChart ? (arrImmoKauf[idx] + arrEtfKauf[idx]) : arrEtfMiete[idx];
+                                return '\nGesamtvermögen: ' + currFmt.format(summe);
+                            },
                             label: function(context) {
-                                let label = context.dataset.label || '';
-                                let idx = context.dataIndex;
-                                if (label === 'Gesamtvermögen (Summe)') {
-                                    return [
-                                        `Gesamt: ${currFmt.format(arrEtfKauf[idx] + arrImmoKauf[idx])}`,
-                                        `   ↳ Haus: ${currFmt.format(arrImmoKauf[idx])}`,
-                                        `   ↳ ETF: ${currFmt.format(arrEtfKauf[idx])}`
-                                    ];
-                                }
-                                return label + ': ' + currFmt.format(context.parsed.y);
-                            } 
+                                return context.dataset.label + ': ' + currFmt.format(context.parsed.y);
+                            }
                         } 
                     }
                 }
             };
-
+            
             // DATASETS
             const dsBuyCash = [
                 { label: 'Wohnkosten', data: wK, backgroundColor: '#3b82f6', fill: true, tension: 0.1 },
@@ -451,37 +436,56 @@
                 { label: 'ETF Einzahlung', data: sK_pos, backgroundColor: '#10b981', fill: true, tension: 0.1 },
                 { label: 'ETF Entnahme', data: sK_neg, backgroundColor: '#ef4444', fill: true, tension: 0.1 }
             ];
-
+            
             const dsRentCash = [
                 { label: 'Kaltmiete', data: wM, backgroundColor: '#3b82f6', fill: true, tension: 0.1 },
                 { label: 'BAföG', data: bM, backgroundColor: '#facc15', fill: true, tension: 0.1 },
                 { label: 'ETF Einzahlung', data: sM_pos, backgroundColor: '#10b981', fill: true, tension: 0.1 },
                 { label: 'ETF Entnahme', data: sM_neg, backgroundColor: '#ef4444', fill: true, tension: 0.1 }
             ];
-
+            
             const dsBuyWealth = [
-                { label: 'Gesamtvermögen (Summe)', data: etfKW.map((v, i) => v + immoKW[i]), backgroundColor: 'transparent', borderColor: 'transparent', pointRadius: 0, hitRadius: 5 },
                 { label: 'Immobilienwert', data: immoKW, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.4)', fill: true, tension: 0.1 },
                 { label: 'ETF-Depot', data: etfKW, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.4)', fill: true, tension: 0.1 },
                 { label: 'Restschuld', data: rsW, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.4)', fill: true, tension: 0.1 }
             ];
-
+            
             const dsRentWealth = [
                 { label: 'ETF-Depot', data: etfMW, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.4)', fill: true, tension: 0.1 }
             ];
-
+            
             // UPDATE OR CREATE
-            if(cBuyCash) { cBuyCash.data.labels = labels; cBuyCash.data.datasets = dsBuyCash; cBuyCash.options.scales.y.max = maxCash; cBuyCash.options.scales.y.min = minCash; cBuyCash.update('none'); } 
-            else { cBuyCash = new Chart(document.getElementById('buyCashflowChart').getContext('2d'), { type: 'line', data: { labels: labels, datasets: dsBuyCash }, options: cashOptions }); }
+            if(cBuyCash) { 
+                cBuyCash.data.labels = labels;
+                cBuyCash.data.datasets = dsBuyCash; cBuyCash.options.scales.y.max = maxCash; cBuyCash.options.scales.y.min = minCash; cBuyCash.update('none');
+            } 
+            else { 
+                cBuyCash = new Chart(document.getElementById('buyCashflowChart').getContext('2d'), { type: 'line', data: { labels: labels, datasets: dsBuyCash }, options: cashOptions });
+            }
 
-            if(cBuyWealth) { cBuyWealth.data.labels = labels; cBuyWealth.data.datasets = dsBuyWealth; cBuyWealth.options.scales.y.max = maxWealth; cBuyWealth.options.scales.y.min = minWealth; cBuyWealth.update('none'); } 
-            else { cBuyWealth = new Chart(document.getElementById('buyWealthChart').getContext('2d'), { type: 'line', data: { labels: labels, datasets: dsBuyWealth }, options: wealthOptions }); }
+            if(cBuyWealth) { 
+                cBuyWealth.data.labels = labels; cBuyWealth.data.datasets = dsBuyWealth;
+                cBuyWealth.options.scales.y.max = maxWealth; cBuyWealth.options.scales.y.min = minWealth; cBuyWealth.update('none'); 
+            } 
+            else { 
+                cBuyWealth = new Chart(document.getElementById('buyWealthChart').getContext('2d'), { type: 'line', data: { labels: labels, datasets: dsBuyWealth }, options: wealthOptions });
+            }
 
-            if(cRentCash) { cRentCash.data.labels = labels; cRentCash.data.datasets = dsRentCash; cRentCash.options.scales.y.max = maxCash; cRentCash.options.scales.y.min = minCash; cRentCash.update('none'); } 
-            else { cRentCash = new Chart(document.getElementById('rentCashflowChart').getContext('2d'), { type: 'line', data: { labels: labels, datasets: dsRentCash }, options: cashOptions }); }
+            if(cRentCash) { 
+                cRentCash.data.labels = labels; cRentCash.data.datasets = dsRentCash;
+                cRentCash.options.scales.y.max = maxCash; cRentCash.options.scales.y.min = minCash; cRentCash.update('none'); 
+            } 
+            else { 
+                cRentCash = new Chart(document.getElementById('rentCashflowChart').getContext('2d'), { type: 'line', data: { labels: labels, datasets: dsRentCash }, options: cashOptions });
+            }
 
-            if(cRentWealth) { cRentWealth.data.labels = labels; cRentWealth.data.datasets = dsRentWealth; cRentWealth.options.scales.y.max = maxWealth; cRentWealth.options.scales.y.min = minWealth; cRentWealth.update('none'); } 
-            else { cRentWealth = new Chart(document.getElementById('rentWealthChart').getContext('2d'), { type: 'line', data: { labels: labels, datasets: dsRentWealth }, options: wealthOptions }); }
+            if(cRentWealth) { 
+                cRentWealth.data.labels = labels; cRentWealth.data.datasets = dsRentWealth;
+                cRentWealth.options.scales.y.max = maxWealth; cRentWealth.options.scales.y.min = minWealth; cRentWealth.update('none'); 
+            } 
+            else { 
+                cRentWealth = new Chart(document.getElementById('rentWealthChart').getContext('2d'), { type: 'line', data: { labels: labels, datasets: dsRentWealth }, options: wealthOptions });
+            }
         }
 
         window.onload = calculateAndDraw;
