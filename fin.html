@@ -189,7 +189,8 @@
         .chart-card h2 { font-size: 0.95rem; margin: 0 0 15px 0; color: var(--text-muted); text-align: center; font-weight: 600;}
         
         .cash-canvas { position: relative; height: 260px; width: 100%; }
-        .wealth-canvas { position: relative; height: 320px; width: 100%; }
+        /* Höhe der unteren Charts vergrößert */
+        .wealth-canvas { position: relative; height: 420px; width: 100%; }
 
         .flex-row { display: flex; gap: 15px; justify-content: space-between; margin-bottom: 16px; }
         .flex-row .control-group { flex: 1; margin-bottom: 0; }
@@ -477,7 +478,6 @@
                 let isFrauInRente = alterFrau >= renteFrauAlter;
                 let anteilArbeitend = (!isMannInRente ? 0.5 : 0) + (!isFrauInRente ? 0.5 : 0);
                 
-                // NEUE BILANZ-LOGIK: Einkommen vs. Ausgaben
                 let lebenshaltungKosten = (wunschNetto - mieteHeute) * 12 * infFaktor;
                 let haushaltEinkommenArbeitHeute = wunschNetto + sparplanHeute;
                 
@@ -603,7 +603,6 @@
                               wK, bK, sK_pos, sK_neg, wM, bM, sM_pos, sM_neg,
                               etfKW, immoKW, rsW, etfMW) {
             
-            // Dynamische Max/Min Berechnung für das Cashflow Chart
             let maxCash = 0;
             let minCash = 0;
             for(let i = 0; i < wK.length; i++) {
@@ -612,11 +611,10 @@
                 maxCash = Math.max(maxCash, sumBuyPos, sumRentPos);
                 minCash = Math.min(minCash, sK_neg[i], sM_neg[i]);
             }
-            maxCash = maxCash * 1.1; // 10% Headroom
+            maxCash = maxCash * 1.1; 
             minCash = minCash * 1.1;
             if (minCash === 0) minCash = 0;
             
-            // Dynamische Max/Min Berechnung für das Wealth Chart (NICHT mehr gestapelt)
             let maxWealth = Math.max(...etfKW, ...immoKW, ...rsW, ...etfMW) * 1.1;
             let minWealth = Math.min(...etfKW, ...immoKW, ...rsW, ...etfMW) * 1.1;
             if(minWealth >= 0) minWealth = 0;
@@ -628,12 +626,28 @@
             
             const absLabelCb = (c) => c.dataset.label + ': ' + currFmt.format(c.parsed.y);
             
+            // Konfiguration für Grid mit sichtbarer Nulllinie
+            const gridConfig = {
+                color: function(context) {
+                    if (context.tick && context.tick.value === 0) return '#64748b';
+                    return '#e2e8f0';
+                },
+                lineWidth: function(context) {
+                    if (context.tick && context.tick.value === 0) return 2;
+                    return 1;
+                }
+            };
+            
             const cashOptions = {
-                responsive: true, maintainAspectRatio: false,
+                responsive: true, maintainAspectRatio: false, animation: false,
                 interaction: { mode: 'index', intersect: false },
                 scales: { 
                     x: { title: { display: false } },
-                    y: { stacked: true, max: maxCash, min: minCash, ticks: { callback: v => currFmt.format(v) } }
+                    y: { 
+                        stacked: true, max: maxCash, min: minCash, 
+                        ticks: { callback: v => currFmt.format(v) },
+                        grid: gridConfig
+                    }
                 },
                 plugins: { 
                     legend: { position: 'bottom', labels: { boxWidth: 12, padding: 10, font: {family: 'Inter'} } },
@@ -642,11 +656,15 @@
             };
             
             const wealthOptions = {
-                responsive: true, maintainAspectRatio: false,
+                responsive: true, maintainAspectRatio: false, animation: false,
                 interaction: { mode: 'index', intersect: false },
                 scales: { 
                     x: { title: { display: false } },
-                    y: { stacked: false, max: maxWealth, min: minWealth, ticks: { callback: v => currFmt.format(v) } }
+                    y: { 
+                        stacked: false, max: maxWealth, min: minWealth, 
+                        ticks: { callback: v => currFmt.format(v) },
+                        grid: gridConfig
+                    }
                 },
                 plugins: { 
                     legend: { position: 'bottom', labels: { boxWidth: 12, padding: 10, font: {family: 'Inter'} } },
@@ -694,28 +712,32 @@
             
             if(cBuyCash) { 
                 cBuyCash.data.labels = labels; cBuyCash.data.datasets = dsBuyCash; 
-                cBuyCash.options.scales.y.max = maxCash; cBuyCash.options.scales.y.min = minCash; cBuyCash.update();
+                cBuyCash.options.scales.y.max = maxCash; cBuyCash.options.scales.y.min = minCash; 
+                cBuyCash.update('none');
             } else { 
                 cBuyCash = new Chart(document.getElementById('buyCashflowChart').getContext('2d'), { type: 'line', data: { labels: labels, datasets: dsBuyCash }, options: cashOptions });
             }
 
             if(cBuyWealth) { 
                 cBuyWealth.data.labels = labels; cBuyWealth.data.datasets = dsBuyWealth;
-                cBuyWealth.options.scales.y.max = maxWealth; cBuyWealth.options.scales.y.min = minWealth; cBuyWealth.update(); 
+                cBuyWealth.options.scales.y.max = maxWealth; cBuyWealth.options.scales.y.min = minWealth; 
+                cBuyWealth.update('none'); 
             } else { 
                 cBuyWealth = new Chart(document.getElementById('buyWealthChart').getContext('2d'), { type: 'line', data: { labels: labels, datasets: dsBuyWealth }, options: wealthOptions });
             }
 
             if(cRentCash) { 
                 cRentCash.data.labels = labels; cRentCash.data.datasets = dsRentCash;
-                cRentCash.options.scales.y.max = maxCash; cRentCash.options.scales.y.min = minCash; cRentCash.update(); 
+                cRentCash.options.scales.y.max = maxCash; cRentCash.options.scales.y.min = minCash; 
+                cRentCash.update('none'); 
             } else { 
                 cRentCash = new Chart(document.getElementById('rentCashflowChart').getContext('2d'), { type: 'line', data: { labels: labels, datasets: dsRentCash }, options: cashOptions });
             }
 
             if(cRentWealth) { 
                 cRentWealth.data.labels = labels; cRentWealth.data.datasets = dsRentWealth;
-                cRentWealth.options.scales.y.max = maxWealth; cRentWealth.options.scales.y.min = minWealth; cRentWealth.update(); 
+                cRentWealth.options.scales.y.max = maxWealth; cRentWealth.options.scales.y.min = minWealth; 
+                cRentWealth.update('none'); 
             } else { 
                 cRentWealth = new Chart(document.getElementById('rentWealthChart').getContext('2d'), { type: 'line', data: { labels: labels, datasets: dsRentWealth }, options: wealthOptions });
             }
