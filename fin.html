@@ -17,109 +17,27 @@
             --info-bg: #f8fafc;
             --info-border: #cbd5e1;
         }
-
         * { box-sizing: border-box; }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            padding: 20px;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px; height: 100vh; display: flex; flex-direction: column; }
         header { margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end;}
         header h1 { margin: 0; font-size: 1.5rem; }
-        
-        .result-badge {
-            background: var(--primary);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-
-        .dashboard {
-            display: grid;
-            grid-template-columns: 400px 1fr;
-            gap: 20px;
-            flex: 1;
-            min-height: 0;
-        }
-
-        .controls-panel {
-            background: var(--panel-bg);
-            border-radius: 12px;
-            padding: 20px;
-            overflow-y: auto;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--border);
-        }
-
+        .result-badge { background: var(--primary); color: white; padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 1.1rem; }
+        .dashboard { display: grid; grid-template-columns: 400px 1fr; gap: 20px; flex: 1; min-height: 0; }
+        .controls-panel { background: var(--panel-bg); border-radius: 12px; padding: 20px; overflow-y: auto; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid var(--border); }
         .control-section { margin-bottom: 25px; }
-        .control-section h3 {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-main);
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 8px;
-            margin-bottom: 15px;
-        }
-
+        .control-section h3 { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-main); border-bottom: 2px solid var(--border); padding-bottom: 8px; margin-bottom: 15px; }
         .control-group { margin-bottom: 15px; }
         .control-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .control-header label { font-size: 0.9rem; font-weight: 500; }
-        .control-header input[type="number"], select {
-            width: 100px;
-            padding: 4px 8px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            text-align: right;
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            color: var(--primary);
-        }
+        .control-header input[type="number"], select { width: 100px; padding: 4px 8px; border: 1px solid var(--border); border-radius: 6px; text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: var(--primary); }
         select { width: 100%; text-align: left; margin-bottom: 10px; padding: 8px; }
-
         input[type="range"] { width: 100%; accent-color: var(--primary); cursor: pointer; }
-
         .charts-panel { display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
-        
-        .info-box {
-            background: var(--info-bg);
-            border: 1px solid var(--info-border);
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            line-height: 1.5;
-            color: var(--text-muted);
-        }
-
-        .chart-card {
-            background: var(--panel-bg);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--border);
-            flex: 1;
-            min-height: 350px;
-            display: flex;
-            flex-direction: column;
-        }
+        .info-box { background: var(--info-bg); border: 1px solid var(--info-border); padding: 15px; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; color: var(--text-muted); }
+        .chart-card { background: var(--panel-bg); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid var(--border); flex: 1; min-height: 350px; display: flex; flex-direction: column; }
         .chart-card h2 { font-size: 1.1rem; margin: 0 0 15px 0; }
-        
         .canvas-wrapper { position: relative; flex: 1; width: 100%; }
-
-        @media (max-width: 1024px) {
-            .dashboard { grid-template-columns: 1fr; }
-            body { height: auto; display: block; }
-            .charts-panel { overflow: visible; }
-        }
+        @media (max-width: 1024px) { .dashboard { grid-template-columns: 1fr; } body { height: auto; display: block; } .charts-panel { overflow: visible; } }
     </style>
 </head>
 <body>
@@ -211,11 +129,11 @@
                     <input type="range" id="wunschNettoSlide" min="2000" max="10000" step="100" value="4500">
                 </div>
                 <div class="control-group">
-                    <div class="control-header"><label>Gesetzl. Rente Mann (€)</label><input type="number" id="rente1Num" value="2000" step="100"></div>
+                    <div class="control-header"><label>Gesetzl. Rente Partner 1 (€)</label><input type="number" id="rente1Num" value="2000" step="100"></div>
                     <input type="range" id="rente1Slide" min="0" max="4000" step="100" value="2000">
                 </div>
                 <div class="control-group">
-                    <div class="control-header"><label>Gesetzl. Rente Frau (€)</label><input type="number" id="rente2Num" value="1500" step="100"></div>
+                    <div class="control-header"><label>Gesetzl. Rente Partner 2 (€)</label><input type="number" id="rente2Num" value="1500" step="100"></div>
                     <input type="range" id="rente2Slide" min="0" max="4000" step="100" value="1500">
                 </div>
                 <div class="control-group">
@@ -227,14 +145,6 @@
 
         <!-- Charts Area -->
         <div class="charts-panel">
-            
-            <div class="info-box">
-                <strong>Methodik der Simulation (Haushaltsbudget):</strong><br>
-                Vor dem Renteneintritt verfügt ihr jeden Monat über ein fiktives Gesamtbudget in Höhe von <em>Kaltmiete heute + Sparplan</em>. <br>
-                <strong>Mieten:</strong> Aus dem Budget wird die (durch Inflation steigende) Miete gezahlt. Der Rest geht in den ETF. Das ETF-Wachstum frisst sich also bei hoher Inflation langsam auf. Im Rentenalter wird die volle Miete + Rentenlücke aus dem ETF abgezogen.<br>
-                <strong>Kaufen:</strong> Aus dem Budget werden Kredit und Hausgeld gezahlt. Der Rest geht in den ETF (ist aber auf eure eingestellte Sparrate nach oben <strong>gedeckelt</strong>). Im Rentenalter wird das Hausgeld + Rentenlücke aus dem ETF entnommen.
-            </div>
-
             <div class="chart-card">
                 <h2>1. Monatliche Wohnkosten & Liquiditätsabfluss</h2>
                 <div class="canvas-wrapper"><canvas id="cashflowChart"></canvas></div>
@@ -244,13 +154,16 @@
                 <h2>2. Gesamtvermögen (Immobilie + ETF) & Restschuld</h2>
                 <div class="canvas-wrapper"><canvas id="wealthChart"></canvas></div>
             </div>
-
         </div>
     </div>
 
     <script>
         let wealthChartInstance = null;
         let cashflowChartInstance = null;
+        
+        let arrImmoKauf = [];
+        let arrEtfKauf = [];
+        let arrRestschuld = [];
 
         const KAUFNEBENKOSTEN_FAKTOR = 0.075;
         const JAHRE_BIS_BAFOEG = 15;
@@ -271,7 +184,10 @@
         });
 
         function calculateAndDraw() {
-            // Parameter
+            arrImmoKauf = [];
+            arrEtfKauf = [];
+            arrRestschuld = [];
+
             const szenario = parseInt(document.getElementById('szenario').value);
             const kaufpreis = parseFloat(document.getElementById('kaufpreis').value) || 0;
             const sanHaus = parseFloat(document.getElementById('sanHaus').value) || 0;
@@ -295,7 +211,6 @@
             const rente2 = parseFloat(document.getElementById('rente2Num').value);
             const zusatzEntnahme = parseFloat(document.getElementById('zusatzEntnahmeNum').value);
 
-            // Finanz-Logik Startwerte
             const nebenkosten = kaufpreis * KAUFNEBENKOSTEN_FAKTOR;
             let projektkostenBank = kaufpreis + sanHaus;
             let barreserve = 0;
@@ -319,7 +234,6 @@
             let rentenlueckeHeute = Math.max(0, wunschNetto - rente1 - rente2);
             const annuitaetP_a = kreditStart * (zins + tilgung);
             
-            // Das feste Haushaltsbudget in der Einkommensphase
             const haushaltsBudgetMtl = mieteHeute + sparplan;
             
             let labels = [];
@@ -344,15 +258,12 @@
                 let kreditCashflow = 0;
 
                 if (year > 0) {
-                    // Kreditabwicklung
                     let zinsKosten = restschuld * zins;
                     let tilgungsLeistung = annuitaetP_a - zinsKosten;
                     
                     if (restschuld > 0) {
                         let gesamtTilgung = tilgungsLeistung + sondertilgung;
-                        if (gesamtTilgung > restschuld) {
-                            gesamtTilgung = restschuld;
-                        }
+                        if (gesamtTilgung > restschuld) { gesamtTilgung = restschuld; }
                         restschuld -= gesamtTilgung;
                         kreditCashflow = zinsKosten + gesamtTilgung;
                     }
@@ -360,37 +271,35 @@
                     immoWert = immoWert * (1 + immoZuwachs);
 
                     // ETF Mieten
-                    etfMieten = etfMieten * (1 + etfRendite);
+                    if (etfMieten > 0) { etfMieten = etfMieten * (1 + etfRendite); } 
+                    else { etfMieten = etfMieten * (1 + zins); } // Zins für Schulden
+                    
                     if (!istInRente) {
-                        // Budget abzgl. Miete geht in ETF
                         let sparrateMieten = (haushaltsBudgetMtl * 12) - mieteJahr;
                         etfMieten += sparrateMieten - entnahmeSohn;
                     } else {
-                        // In der Rente: Keine Einzahlung, Miete und Rentenlücke werden abgezogen
                         etfMieten -= mieteJahr + entnahmeRente + entnahmeSohn;
                     }
-                    if(etfMieten < 0) etfMieten = 0;
 
                     // ETF Kaufen
-                    etfKaufen = etfKaufen * (1 + etfRendite);
+                    if (etfKaufen > 0) { etfKaufen = etfKaufen * (1 + etfRendite); } 
+                    else { etfKaufen = etfKaufen * (1 + zins); } // Zins für Schulden
+                    
                     if (!istInRente) {
                         let wohnkostenKauf = kreditCashflow + hausgeldJahr;
                         let sparrateKaufen = (haushaltsBudgetMtl * 12) - wohnkostenKauf;
-                        
-                        // Deckelung auf die eingestellte Sparrate!
-                        if (sparrateKaufen > sparplan * 12) {
-                            sparrateKaufen = sparplan * 12;
-                        }
+                        if (sparrateKaufen > sparplan * 12) { sparrateKaufen = sparplan * 12; }
                         etfKaufen += sparrateKaufen - entnahmeSohn;
                     } else {
-                        // In der Rente: Wohnkosten (Hausgeld + Restkredit) und Rente werden entnommen
                         etfKaufen -= (kreditCashflow + hausgeldJahr) + entnahmeRente + entnahmeSohn;
                     }
-                    if(etfKaufen < 0) etfKaufen = 0;
-                    
                 } else {
                     kreditCashflow = (restschuld > 0) ? annuitaetP_a + sondertilgung : 0;
                 }
+
+                arrImmoKauf.push(immoWert);
+                arrEtfKauf.push(etfKaufen);
+                arrRestschuld.push(restschuld);
 
                 dataWealthMieten.push(Math.round(etfMieten));
                 dataWealthKaufen.push(Math.round(etfKaufen + immoWert - restschuld));
@@ -414,8 +323,7 @@
             const commonOptions = {
                 responsive: true, maintainAspectRatio: false,
                 interaction: { mode: 'index', intersect: false },
-                scales: { y: { ticks: { callback: v => currFmt.format(v) } }, x: { title: { display: true, text: 'Lebensalter (Jahre)' } } },
-                plugins: { tooltip: { callbacks: { label: c => c.dataset.label + ': ' + currFmt.format(c.parsed.y) } } }
+                scales: { y: { ticks: { callback: v => currFmt.format(v) } }, x: { title: { display: true, text: 'Lebensalter (Jahre)' } } }
             };
 
             cashflowChartInstance = new Chart(ctx2, {
@@ -427,7 +335,10 @@
                         { label: 'Wohnkosten Kaufen (mtl.)', data: ck, borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', borderWidth: 3, fill: true, stepped: true }
                     ]
                 },
-                options: commonOptions
+                options: {
+                    ...commonOptions,
+                    plugins: { tooltip: { callbacks: { label: c => c.dataset.label + ': ' + currFmt.format(c.parsed.y) } } }
+                }
             });
 
             wealthChartInstance = new Chart(ctx1, {
@@ -436,15 +347,4 @@
                     labels: labels,
                     datasets: [
                         { label: 'Gesamtvermögen Kaufen', data: wk, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 3, fill: true, tension: 0.3 },
-                        { label: 'Gesamtvermögen Mieten', data: wm, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.05)', borderWidth: 2, fill: true, tension: 0.3 },
-                        { label: 'Restschuld Kredit', data: dr, borderColor: '#94a3b8', borderDash: [5, 5], borderWidth: 2, fill: false, tension: 0.1 }
-                    ]
-                },
-                options: commonOptions
-            });
-        }
-
-        window.onload = calculateAndDraw;
-    </script>
-</body>
-</html>
+                        { label: 'Gesamtvermögen Mieten', data: wm, borderColor: '#ef4444', backgroundC
