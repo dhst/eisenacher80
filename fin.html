@@ -6,6 +6,7 @@
     <title>Dashboard: Finanzierung & Lebensplanung Leipzig</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
         :root {
             --bg-color: #f1f5f9;
@@ -17,27 +18,115 @@
             --info-bg: #f8fafc;
             --info-border: #cbd5e1;
         }
+
         * { box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px; height: 100vh; display: flex; flex-direction: column; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+        }
+
         header { margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end;}
         header h1 { margin: 0; font-size: 1.5rem; }
-        .result-badge { background: var(--primary); color: white; padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 1.1rem; }
-        .dashboard { display: grid; grid-template-columns: 400px 1fr; gap: 20px; flex: 1; min-height: 0; }
-        .controls-panel { background: var(--panel-bg); border-radius: 12px; padding: 20px; overflow-y: auto; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid var(--border); }
+        
+        .result-badge {
+            background: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .controls-panel {
+            background: var(--panel-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+        }
+
         .control-section { margin-bottom: 25px; }
-        .control-section h3 { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-main); border-bottom: 2px solid var(--border); padding-bottom: 8px; margin-bottom: 15px; }
+        .control-section h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-main);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+        }
+
         .control-group { margin-bottom: 15px; }
         .control-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .control-header label { font-size: 0.9rem; font-weight: 500; }
-        .control-header input[type="number"], select { width: 100px; padding: 4px 8px; border: 1px solid var(--border); border-radius: 6px; text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: var(--primary); }
+        .control-header input[type="number"], select {
+            width: 100px;
+            padding: 4px 8px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            text-align: right;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            color: var(--primary);
+        }
         select { width: 100%; text-align: left; margin-bottom: 10px; padding: 8px; }
+
         input[type="range"] { width: 100%; accent-color: var(--primary); cursor: pointer; }
-        .charts-panel { display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
-        .info-box { background: var(--info-bg); border: 1px solid var(--info-border); padding: 15px; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; color: var(--text-muted); }
-        .chart-card { background: var(--panel-bg); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid var(--border); flex: 1; min-height: 350px; display: flex; flex-direction: column; }
+
+        .charts-panel { display: flex; flex-direction: column; gap: 20px; }
+        
+        .info-box {
+            background: var(--info-bg);
+            border: 1px solid var(--info-border);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: var(--text-muted);
+        }
+
+        .chart-card {
+            background: var(--panel-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+        }
         .chart-card h2 { font-size: 1.1rem; margin: 0 0 15px 0; }
-        .canvas-wrapper { position: relative; flex: 1; width: 100%; }
-        @media (max-width: 1024px) { .dashboard { grid-template-columns: 1fr; } body { height: auto; display: block; } .charts-panel { overflow: visible; } }
+        
+        /* FESTE HÖHE GARANTIERT DIE SICHTBARKEIT DES CHARTS */
+        .canvas-wrapper { 
+            position: relative; 
+            height: 400px; 
+            width: 100%; 
+        }
+
+        /* Container für Fehlermeldungen */
+        #error-msg {
+            display: none;
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -48,9 +137,10 @@
         </div>
         <div class="result-badge" id="darlehenDisplay">Darlehen: 0 €</div>
     </header>
+    
+    <div id="error-msg">Achtung: Die Diagramm-Bibliothek konnte nicht geladen werden. Bitte überprüfe, ob ein Adblocker das Laden von cdn.jsdelivr.net verhindert.</div>
 
     <div class="dashboard">
-        <!-- Controls Sidebar -->
         <div class="controls-panel">
             
             <div class="control-section">
@@ -143,8 +233,15 @@
             </div>
         </div>
 
-        <!-- Charts Area -->
         <div class="charts-panel">
+            
+            <div class="info-box">
+                <strong>Methodik der Simulation (Haushaltsbudget):</strong><br>
+                Vor dem Renteneintritt verfügt ihr jeden Monat über ein fiktives Gesamtbudget in Höhe von <em>Kaltmiete heute + Sparplan</em>. <br>
+                <strong>Mieten:</strong> Aus dem Budget wird die (durch Inflation steigende) Miete gezahlt. Der Rest geht in den ETF. Das ETF-Wachstum frisst sich also bei hoher Inflation langsam auf. Im Rentenalter wird die volle Miete + Rentenlücke aus dem ETF abgezogen.<br>
+                <strong>Kaufen:</strong> Aus dem Budget werden Kredit und Hausgeld gezahlt. Der Rest geht in den ETF (ist aber auf eure eingestellte Sparrate nach oben <strong>gedeckelt</strong>). Im Rentenalter wird das Hausgeld + Rentenlücke aus dem ETF entnommen.
+            </div>
+
             <div class="chart-card">
                 <h2>1. Monatliche Wohnkosten & Liquiditätsabfluss</h2>
                 <div class="canvas-wrapper"><canvas id="cashflowChart"></canvas></div>
@@ -154,10 +251,17 @@
                 <h2>2. Gesamtvermögen (Immobilie + ETF) & Restschuld</h2>
                 <div class="canvas-wrapper"><canvas id="wealthChart"></canvas></div>
             </div>
+
         </div>
     </div>
 
     <script>
+        // Check if Chart JS loaded properly
+        if (typeof Chart === 'undefined') {
+            document.getElementById('darlehenDisplay').style.display = 'none';
+            document.getElementById('darlehenDisplay').parentElement.innerHTML += '<div style="background:#ef4444; color:white; padding: 10px; border-radius: 8px;">Fehler: Chart.js konnte nicht geladen werden. Bitte Internetverbindung prüfen.</div>';
+        }
+
         let wealthChartInstance = null;
         let cashflowChartInstance = null;
         
@@ -170,47 +274,55 @@
         const BAFOEG_DAUER = 5;
         const JAHRE_BIS_RENTE = 25;
 
+        // Regler und Nummerneingabe synchronisieren
         const syncPairs = ['zins', 'tilgung', 'sondertilgung', 'hausgeld', 'miete', 'sparplan', 'etfRendite', 'immoZuwachs', 'inflation', 'bafoeg', 'wunschNetto', 'rente1', 'rente2', 'zusatzEntnahme'];
         
         syncPairs.forEach(id => {
             const num = document.getElementById(id + 'Num');
             const slide = document.getElementById(id + 'Slide');
-            num.addEventListener('input', () => { slide.value = num.value; calculateAndDraw(); });
-            slide.addEventListener('input', () => { num.value = slide.value; calculateAndDraw(); });
+            if(num && slide) {
+                num.addEventListener('input', () => { slide.value = num.value; calculateAndDraw(); });
+                slide.addEventListener('input', () => { num.value = slide.value; calculateAndDraw(); });
+            }
         });
 
-        ['kaufpreis', 'sanHaus', 'sanWohnung', 'ek'].forEach(id => {
-            document.getElementById(id).addEventListener('input', calculateAndDraw);
+        ['kaufpreis', 'sanHaus', 'sanWohnung', 'ek', 'szenario'].forEach(id => {
+            let el = document.getElementById(id);
+            if(el) el.addEventListener('input', calculateAndDraw);
         });
 
         function calculateAndDraw() {
+            if (typeof Chart === 'undefined') return;
+
             arrImmoKauf = [];
             arrEtfKauf = [];
             arrRestschuld = [];
 
-            const szenario = parseInt(document.getElementById('szenario').value);
+            // Parameter sicher auslesen (mit Fallback auf 0 falls Feld leer ist)
+            const szenario = parseInt(document.getElementById('szenario').value) || 2;
             const kaufpreis = parseFloat(document.getElementById('kaufpreis').value) || 0;
             const sanHaus = parseFloat(document.getElementById('sanHaus').value) || 0;
             const sanWohnung = parseFloat(document.getElementById('sanWohnung').value) || 0;
             const eigenkapital = parseFloat(document.getElementById('ek').value) || 0;
 
-            const zins = parseFloat(document.getElementById('zinsNum').value) / 100;
-            const tilgung = parseFloat(document.getElementById('tilgungNum').value) / 100;
-            const sondertilgung = parseFloat(document.getElementById('sondertilgungNum').value);
+            const zins = (parseFloat(document.getElementById('zinsNum').value) || 0) / 100;
+            const tilgung = (parseFloat(document.getElementById('tilgungNum').value) || 0) / 100;
+            const sondertilgung = parseFloat(document.getElementById('sondertilgungNum').value) || 0;
             
-            const hausgeldHeute = parseFloat(document.getElementById('hausgeldNum').value);
-            const mieteHeute = parseFloat(document.getElementById('mieteNum').value);
-            const sparplan = parseFloat(document.getElementById('sparplanNum').value);
-            const etfRendite = parseFloat(document.getElementById('etfRenditeNum').value) / 100;
-            const immoZuwachs = parseFloat(document.getElementById('immoZuwachsNum').value) / 100;
-            const inflation = parseFloat(document.getElementById('inflationNum').value) / 100;
+            const hausgeldHeute = parseFloat(document.getElementById('hausgeldNum').value) || 0;
+            const mieteHeute = parseFloat(document.getElementById('mieteNum').value) || 0;
+            const sparplan = parseFloat(document.getElementById('sparplanNum').value) || 0;
+            const etfRendite = (parseFloat(document.getElementById('etfRenditeNum').value) || 0) / 100;
+            const immoZuwachs = (parseFloat(document.getElementById('immoZuwachsNum').value) || 0) / 100;
+            const inflation = (parseFloat(document.getElementById('inflationNum').value) || 0) / 100;
             
-            const bafoegBetrag = parseFloat(document.getElementById('bafoegNum').value);
-            const wunschNetto = parseFloat(document.getElementById('wunschNettoNum').value);
-            const rente1 = parseFloat(document.getElementById('rente1Num').value);
-            const rente2 = parseFloat(document.getElementById('rente2Num').value);
-            const zusatzEntnahme = parseFloat(document.getElementById('zusatzEntnahmeNum').value);
+            const bafoegBetrag = parseFloat(document.getElementById('bafoegNum').value) || 0;
+            const wunschNetto = parseFloat(document.getElementById('wunschNettoNum').value) || 0;
+            const rente1 = parseFloat(document.getElementById('rente1Num').value) || 0;
+            const rente2 = parseFloat(document.getElementById('rente2Num').value) || 0;
+            const zusatzEntnahme = parseFloat(document.getElementById('zusatzEntnahmeNum').value) || 0;
 
+            // Logik
             const nebenkosten = kaufpreis * KAUFNEBENKOSTEN_FAKTOR;
             let projektkostenBank = kaufpreis + sanHaus;
             let barreserve = 0;
@@ -272,7 +384,7 @@
 
                     // ETF Mieten
                     if (etfMieten > 0) { etfMieten = etfMieten * (1 + etfRendite); } 
-                    else { etfMieten = etfMieten * (1 + zins); } // Zins für Schulden
+                    else { etfMieten = etfMieten * (1 + zins); } 
                     
                     if (!istInRente) {
                         let sparrateMieten = (haushaltsBudgetMtl * 12) - mieteJahr;
@@ -283,7 +395,7 @@
 
                     // ETF Kaufen
                     if (etfKaufen > 0) { etfKaufen = etfKaufen * (1 + etfRendite); } 
-                    else { etfKaufen = etfKaufen * (1 + zins); } // Zins für Schulden
+                    else { etfKaufen = etfKaufen * (1 + zins); } 
                     
                     if (!istInRente) {
                         let wohnkostenKauf = kreditCashflow + hausgeldJahr;
@@ -337,7 +449,7 @@
                 },
                 options: {
                     ...commonOptions,
-                    plugins: { tooltip: { callbacks: { label: c => c.dataset.label + ': ' + currFmt.format(c.parsed.y) } } }
+                    plugins: { tooltip: { callbacks: { label: c => c.dataset.label + ': ' + currFmt.format(c.parsed.raw) } } }
                 }
             });
 
@@ -361,12 +473,12 @@
                                     if (label === 'Gesamtvermögen Kaufen') {
                                         let idx = context.dataIndex;
                                         return [
-                                            label + ': ' + currFmt.format(context.parsed.y),
-                                            '   ↳ Immobilie: ' + currFmt.format(arrImmoKauf[idx]),
+                                            label + ': ' + currFmt.format(context.raw),
+                                            '   ↳ Haus-Anteil: ' + currFmt.format(arrImmoKauf[idx]),
                                             '   ↳ ETF-Depot: ' + currFmt.format(arrEtfKauf[idx])
                                         ];
                                     }
-                                    return label + ': ' + currFmt.format(context.parsed.y);
+                                    return label + ': ' + currFmt.format(context.raw);
                                 } 
                             } 
                         } 
@@ -375,7 +487,8 @@
             });
         }
 
-        window.onload = calculateAndDraw;
+        // Init initial run
+        calculateAndDraw();
     </script>
 </body>
 </html>
